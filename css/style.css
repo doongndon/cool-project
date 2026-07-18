@@ -410,6 +410,11 @@ button { font-family: inherit; color: inherit; }
 }
 .fp-size.on { border-color: #3182f6; color: #3182f6; background: #e8f1fe; }
 
+.fp-subtitle {
+  font-size: 12px; font-weight: 700; color: #8b95a1;
+  padding: 14px 16px 8px;
+}
+
 /* Wi-Fi 스위치 */
 .fp-toggle-row { justify-content: space-between; cursor: default; }
 .fp-switch {
