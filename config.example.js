@@ -1,6 +1,10 @@
-// 로컬 실행 시 API 키를 매번 입력하지 않으려면:
-// 1) 이 파일을 config.js 로 복사
-// 2) 아래 따옴표 안에 본인의 Gemini API 키를 넣기 (https://aistudio.google.com/apikey 에서 무료 발급)
-// 주의: 공개 저장소에 키를 올리면 Google이 자동으로 정지시킵니다.
-//       배포본에는 키를 넣지 말고, 앱의 설정(⚙️)에서 각자 넣는 것을 권장합니다.
-window.AI_SONJU_DEFAULT_KEY = "AQ.Ab8RN6IM5Cslsi_7FTRGEEVTAZUs4Dn_XD6WKHEal9b0v4sExA";
+// ── AI 손주 설정 ──
+// 어르신이 키를 만지지 않게 하려면 아래 둘 중 하나:
+//
+// [권장] 프록시 서버 방식 — 키가 서버에 숨겨져 절대 유출·정지 안 됨
+//   proxy/worker.js 를 Cloudflare에 배포한 뒤, 그 주소를 여기에 넣으세요.
+//   그러면 어르신은 링크만 열면 바로 작동합니다.
+// window.AI_SONJU_PROXY_URL = "https://ai-sonju.본인계정.workers.dev";
+//
+// [로컬 개발용] 키 직접 넣기 — 공개 저장소에는 올리지 마세요(구글이 정지시킴).
+// window.AI_SONJU_DEFAULT_KEY = "AIza...";

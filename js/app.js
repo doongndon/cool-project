@@ -110,6 +110,8 @@ $("save-key").addEventListener("click", () => {
   loadDailyTip(); // 키가 생겼으니 오늘의 꿀팁도 바로 보여준다
 });
 function requireKey() {
+  // 프록시 서버가 있으면 어르신은 키가 필요 없다
+  if (window.AI_SONJU_PROXY_URL) return true;
   if (!getKey()) {
     toast("먼저 무료 키를 한 번만 설정해주세요");
     openSettings();
@@ -175,12 +177,32 @@ function shrinkDataUrl(dataUrl, maxSize = 640) {
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 async function callGemini(parts, { json = true } = {}) {
-  const key = getKey();
   const body = {
     contents: [{ role: "user", parts }],
     generationConfig: json ? { responseMimeType: "application/json", temperature: 0.3 } : { temperature: 0.3 },
   };
 
+  // 프록시 서버가 설정돼 있으면 그쪽으로 보낸다 (키가 서버에 숨겨져 있어 어르신은 아무것도 안 넣어도 됨)
+  if (window.AI_SONJU_PROXY_URL) {
+    let res;
+    try {
+      res = await fetch(window.AI_SONJU_PROXY_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+    } catch (_) {
+      throw new Error("인터넷 연결이 안 되는 것 같아요. 와이파이나 데이터를 확인하고 다시 눌러주세요.");
+    }
+    if (res.status === 429) throw new Error("지금 이용자가 많아요. 잠시 후 다시 눌러주세요.");
+    if (!res.ok) throw new Error("잠시 문제가 생겼어요. 다시 한 번 눌러주세요.");
+    const data = await res.json().catch(() => ({}));
+    const text = data?.candidates?.[0]?.content?.parts?.map((p) => p.text || "").join("") || "";
+    if (!text) throw new Error("답을 받지 못했어요. 다시 한 번 눌러주세요.");
+    return json ? parseJsonSafe(text) : text;
+  }
+
+  const key = getKey();
   let lastErr = null;
   for (const model of MODELS) {
     // 무료 사용량 초과(429)는 잠깐 쉬었다 자동으로 한 번 더 시도한다
@@ -1024,6 +1046,7 @@ if ("serviceWorker" in navigator) {
 }
 
 // ---------- 첫 실행 안내 ----------
-if (!getKey()) {
+// 프록시가 없고 키도 없을 때만 설정을 연다 (프록시 배포본은 어르신이 아무것도 안 함)
+if (!window.AI_SONJU_PROXY_URL && !getKey()) {
   setTimeout(openSettings, 600);
 }
