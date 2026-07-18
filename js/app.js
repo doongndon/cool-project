@@ -186,8 +186,12 @@ async function callGemini(parts, { json = true } = {}) {
         }
         if (res.status === 404) { lastErr = new Error("model-not-found"); break; }
         if (res.status === 429) {
+          // 무료 사용량은 모델별로 따로다: 짧게 재시도해보고, 그래도 막히면 다음 모델로 갈아탄다
           if (attempt === 0) { toast("사용량이 많아 잠시 기다렸다 다시 해볼게요..."); await sleep(3000); continue; }
-          throw new Error("무료 사용량을 잠시 다 썼어요. 1분 뒤에 다시 눌러주세요.");
+          lastErr = new Error("오늘 무료 사용량을 모두 썼어요. 잠시 후 다시 해주세요.");
+          const next = MODELS[MODELS.indexOf(model) + 1];
+          if (next) toast("이 모델 사용량이 가득 차서 예비 모델로 바꿔볼게요...");
+          break;
         }
         if (res.status === 400 || res.status === 403) {
           const detail = await res.json().catch(() => ({}));
