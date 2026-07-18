@@ -188,7 +188,7 @@ ${feedback ? `\n(이전 설계의 문제: ${feedback} — 반드시 고쳐서 �
     $(step.target).classList.add("fp-target");
     $("pb-step").textContent = `${stepIdx + 1} / ${plan.steps.length}`;
     $("pb-text").textContent = step.say;
-    speak(step.say);
+    speakNow(step.say);
   }
 
   function finish() {
@@ -198,7 +198,7 @@ ${feedback ? `\n(이전 설계의 문제: ${feedback} — 반드시 고쳐서 �
     $("pb-text").textContent = "참 잘하셨어요!";
     $("congrats-desc").textContent = plan.done || "진짜 폰에서도 똑같이 해보세요!";
     $("fp-congrats").classList.remove("hidden");
-    speak(`참 잘하셨어요! ${plan.done || ""}`);
+    speakNow(`참 잘하셨어요! ${plan.done || ""}`);
   }
 
   function runPlan(p) {

@@ -204,10 +204,23 @@ function parseJsonSafe(text) {
 // 크롬(안드로이드)은 한 번에 긴 문장을 읽으면 15초쯤에서 뚝 끊긴다.
 // 문장 단위로 잘라 이어 읽게 해서 해결. 읽는 중에 다시 누르면 멈춘다.
 function speak(text) {
+  // 버튼용: 읽는 중에 다시 누르면 멈춘다 (토글)
   const synth = window.speechSynthesis;
   if (!synth) { toast("이 브라우저는 소리 읽기를 지원하지 않아요"); return; }
   if (synth.speaking || synth.pending) { synth.cancel(); toast("읽기를 멈췄어요"); return; }
+  queueSpeech(text);
+}
 
+function speakNow(text) {
+  // 자동 안내용: 이전 음성을 끊고 즉시 새 안내를 읽는다 (연습 단계, 안내창 등)
+  const synth = window.speechSynthesis;
+  if (!synth) return;
+  synth.cancel();
+  queueSpeech(text);
+}
+
+function queueSpeech(text) {
+  const synth = window.speechSynthesis;
   const rate = parseFloat(localStorage.getItem(SPEED_STORAGE) || "0.95");
   const sentences = text.match(/[^.!?\n]+[.!?\n]?/g) || [text];
   // 너무 잘게 쪼개지 않도록 140자 안에서 문장을 다시 묶는다
@@ -710,7 +723,7 @@ function drawFloatStep() {
 function setFloatIdx(idx) {
   floatIdx = Math.min(Math.max(idx, 0), floatSteps.length - 1);
   drawFloatStep();
-  speak(floatSteps[floatIdx]);
+  speakNow(floatSteps[floatIdx]);
 }
 
 async function startFloatingGuide(steps) {
@@ -752,7 +765,7 @@ async function startFloatingGuide(steps) {
       navigator.mediaSession.setActionHandler("previoustrack", () => setFloatIdx(floatIdx - 1));
       navigator.mediaSession.setActionHandler("nexttrack", () => setFloatIdx(floatIdx + 1));
     }
-    speak(`안내창을 띄웠어요. 이제 홈으로 나가서 따라해 보세요. 1번. ${floatSteps[0]}`);
+    speakNow(`안내창을 띄웠어요. 이제 홈으로 나가서 따라해 보세요. 1번. ${floatSteps[0]}`);
     toast("안내창이 떴어요! 홈 버튼을 눌러 나가도 계속 보여요.");
   } catch (e) {
     toast("화면 위 안내창을 띄우지 못했어요. 크롬 최신 버전에서 다시 해보세요.");
@@ -875,6 +888,44 @@ $("scam-restart").addEventListener("click", () => {
   scamShotFile = null;
   $("scam-shot-name").textContent = "";
 });
+
+// ---------- 오늘의 폰 꿀팁 (AI가 매일 하나씩) ----------
+const TIP_STORAGE = "ai_sonju_daily_tip";
+
+async function loadDailyTip(force = false) {
+  if (!getKey()) return; // 키 없으면 조용히 건너뛴다
+  const today = new Date().toDateString();
+  try {
+    const cached = JSON.parse(localStorage.getItem(TIP_STORAGE) || "null");
+    if (!force && cached && cached.day === today && cached.text) {
+      showTip(cached.text);
+      return;
+    }
+  } catch (_) { /* 캐시가 깨졌으면 새로 받는다 */ }
+
+  try {
+    const tip = await callGemini([{ text:
+      "당신은 어르신을 돕는 다정한 손주 AI입니다. 할머니 할아버지께 도움되는 스마트폰 사용 꿀팁을 딱 하나만, " +
+      "2~3문장의 아주 쉬운 한국어로 알려주세요. 인사말이나 설명 없이 꿀팁 내용만 답하세요." +
+      (force ? " 흔한 꿀팁 말고 조금 색다른 것으로요." : "")
+    }], { json: false });
+    localStorage.setItem(TIP_STORAGE, JSON.stringify({ day: today, text: tip.trim() }));
+    showTip(tip.trim());
+  } catch (_) { /* 홈 화면이므로 오류를 떠들지 않는다 */ }
+}
+
+function showTip(text) {
+  $("tip-text").textContent = text;
+  $("tip-card").classList.remove("hidden");
+  $("tip-tts").onclick = () => speak(text);
+}
+
+$("tip-refresh").addEventListener("click", () => {
+  $("tip-text").textContent = "새 꿀팁을 가져오고 있어요...";
+  loadDailyTip(true);
+});
+
+loadDailyTip();
 
 // ---------- 첫 실행 안내 ----------
 if (!getKey()) {
