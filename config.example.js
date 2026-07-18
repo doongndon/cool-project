@@ -1,6 +1,6 @@
 // 로컬 실행 시 API 키를 매번 입력하지 않으려면:
 // 1) 이 파일을 config.js 로 복사
-// 2) 아래에 본인의 Gemini API 키를 넣기 (https://aistudio.google.com/apikey 에서 무료 발급)
-// config.js 는 .gitignore 에 등록되어 있어 저장소에 올라가지 않습니다.
-// 주의: 키를 절대 GitHub에 커밋하지 마세요!
-window.AI_SONJU_DEFAULT_KEY = "AIzaSyAzxF5auIeJm2u7M6TzkH1uxz0_zXqsMyE";
+// 2) 아래 따옴표 안에 본인의 Gemini API 키를 넣기 (https://aistudio.google.com/apikey 에서 무료 발급)
+// 주의: 공개 저장소에 키를 올리면 Google이 자동으로 정지시킵니다.
+//       배포본에는 키를 넣지 말고, 앱의 설정(⚙️)에서 각자 넣는 것을 권장합니다.
+window.AI_SONJU_DEFAULT_KEY = "";

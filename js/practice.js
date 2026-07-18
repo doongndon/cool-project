@@ -15,13 +15,22 @@
   const ELEMENTS = {
     "fp-app-settings": { screen: "fp-home", goto: "fp-set-main", desc: "'설정' 앱 아이콘" },
     "fp-app-kakao": { screen: "fp-home", goto: "fp-kakao-list", desc: "'카카오톡' 앱 아이콘" },
+    "fp-app-call": { screen: "fp-home", goto: "fp-call-list", desc: "'전화' 앱 아이콘" },
+
+    "fp-call-daughter": { screen: "fp-call-list", effect: "callStart", goto: "fp-call-active", desc: "즐겨찾기의 '사랑하는 딸' (누르면 전화가 걸림)" },
+    "fp-call-end": { screen: "fp-call-active", effect: "callEnd", goto: "fp-call-list", desc: "빨간 전화 끊기 버튼" },
 
     "fp-row-connect": { screen: "fp-set-main", goto: "fp-set-connect", desc: "'연결' 메뉴 (Wi-Fi, 블루투스)" },
     "fp-row-sound": { screen: "fp-set-main", goto: "fp-set-sound", desc: "'소리·진동' 메뉴 (무음 모드, 벨소리)" },
     "fp-row-display": { screen: "fp-set-main", goto: "fp-set-display", desc: "'디스플레이' 메뉴 (밝기, 글자 크기)" },
 
     "fp-row-fontsize": { screen: "fp-set-display", goto: "fp-set-fontsize", desc: "'글자 크기' 메뉴" },
+    "fp-row-bright": { screen: "fp-set-display", goto: "fp-set-bright", desc: "'밝기' 메뉴" },
     "fp-row-timeout": { screen: "fp-set-display", goto: "fp-set-timeout", desc: "'화면 자동 꺼짐' 메뉴" },
+
+    "fp-bright-low": { screen: "fp-set-bright", effect: "brightSel", desc: "밝기 '어둡게' 버튼" },
+    "fp-bright-mid": { screen: "fp-set-bright", effect: "brightSel", desc: "밝기 '보통' 버튼" },
+    "fp-bright-high": { screen: "fp-set-bright", effect: "brightSel", desc: "밝기 '밝게' 버튼" },
 
     "fp-size-small": { screen: "fp-set-fontsize", effect: "fontSel", desc: "글자 크기 '작게' 버튼" },
     "fp-size-mid": { screen: "fp-set-fontsize", effect: "fontSel", desc: "글자 크기 '보통' 버튼" },
@@ -74,6 +83,14 @@
       $("fp-wifi-state").textContent = "켜짐";
     },
     wifiConnect() { $("fp-wifi-home-state").textContent = "연결됨"; },
+    callStart() { $("fp-call-state").textContent = "통화 중..."; },
+    callEnd() { /* 목록으로 돌아가는 것으로 충분 */ },
+    brightSel(id) {
+      ["fp-bright-low", "fp-bright-mid", "fp-bright-high"].forEach((v) => $(v).classList.remove("on"));
+      $(id).classList.add("on");
+      const level = { "fp-bright-low": "0.45", "fp-bright-mid": "0.75", "fp-bright-high": "1" }[id];
+      $("fp-bright-sample").style.opacity = level;
+    },
     photoSel() { $("fp-photo-1").classList.add("selected"); },
     photoSend() {
       const photo = document.createElement("div");
@@ -179,6 +196,9 @@ ${feedback ? `\n(이전 설계의 문제: ${feedback} — 반드시 고쳐서 �
     $("fp-wifi-home-state").textContent = "잠김";
     $("fp-photo-1").classList.remove("selected");
     document.querySelectorAll('#fp-msgs [data-practice]').forEach((el) => el.remove());
+    ["fp-bright-low", "fp-bright-mid", "fp-bright-high"].forEach((v) => $(v).classList.remove("on"));
+    $("fp-bright-mid").classList.add("on");
+    $("fp-bright-sample").style.opacity = "0.75";
     switchFp("fp-home");
   }
 
