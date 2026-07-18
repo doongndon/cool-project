@@ -88,11 +88,12 @@ function toast(msg, ms = 3500) {
 
 // ---------- API 키 ----------
 function getKey() {
-  // 배포본에 내장된 기본 키가 있으면 그것을 최우선으로 쓴다
-  // (예시 파일의 안내 문구나 잘못된 키는 형식 검사로 걸러낸다)
+  // 내 폰에 직접 저장한 키가 항상 최우선 — 배포본 내장 키가 죽어도 설정에서 바로 덮어쓸 수 있다
+  const mine = (localStorage.getItem(KEY_STORAGE) || "").trim();
+  if (mine) return mine;
   const embedded = window.AI_SONJU_DEFAULT_KEY;
   if (embedded && /^AIza[0-9A-Za-z_-]{30,}$/.test(embedded)) return embedded;
-  return localStorage.getItem(KEY_STORAGE) || "";
+  return "";
 }
 function openSettings() {
   $("api-key-input").value = getKey();
@@ -115,6 +116,18 @@ function requireKey() {
     return false;
   }
   return true;
+}
+
+// 죽은 내장 키를 무시하도록 표시하고, 새 키 입력창을 연다
+let badKeyFlagged = false;
+function keyIsBad() {
+  if (badKeyFlagged) return;
+  badKeyFlagged = true;
+  // 내장 키가 죽었는데 내 저장 키가 없으면, 내장 키를 못 쓰게 막고 설정을 연다
+  if (!localStorage.getItem(KEY_STORAGE)) {
+    window.AI_SONJU_DEFAULT_KEY = "";
+    setTimeout(openSettings, 400);
+  }
 }
 
 // ---------- 이미지 유틸 ----------
@@ -196,7 +209,11 @@ async function callGemini(parts, { json = true } = {}) {
         if (res.status === 400 || res.status === 403) {
           const detail = await res.json().catch(() => ({}));
           const msg = detail?.error?.message || "";
-          if (/api key/i.test(msg)) throw new Error("키가 올바르지 않아요. 설정에서 다시 붙여넣어 주세요.");
+          // 키가 죽었거나(유출 신고·정지) 잘못된 경우: 설정을 열어 새 키를 넣게 안내
+          if (/leaked|expired|invalid|api key|permission|not authorized|suspend/i.test(msg)) {
+            keyIsBad();
+            throw new Error("열쇠(키)가 막혔어요. 설정에서 새 키를 넣어주세요.");
+          }
           lastErr = new Error("요청이 거절되었어요. 다시 한 번 눌러주세요.");
           break;
         }
