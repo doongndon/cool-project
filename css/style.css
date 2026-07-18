@@ -166,6 +166,7 @@ button { font-family: inherit; color: inherit; }
 .big-btn.primary { background: var(--accent); color: #fff; }
 .big-btn.primary:active { background: var(--accent-press); }
 .big-btn.speak { background: var(--green-soft); color: var(--green-text); }
+.big-btn.accent { background: var(--accent-soft); color: var(--accent); }
 
 /* 결과 상단 버튼 2열 */
 .btn-row { display: flex; gap: 0.6rem; }

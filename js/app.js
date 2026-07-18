@@ -502,10 +502,13 @@ function phoneShareText(data) {
     (data.steps || []).map((s, i) => `${i + 1}. ${s}`).join("\n");
 }
 
+let currentPhoneSteps = [];
+
 function renderPhoneResult(data, shotImg) {
   $("phone-loading").classList.add("hidden");
   $("phone-result").classList.remove("hidden");
 
+  currentPhoneSteps = data.steps || [];
   $("phone-answer").textContent = data.answer || "";
 
   const ol = $("phone-steps");
@@ -650,6 +653,125 @@ function roundRect(ctx, x, y, w, h, r) {
   ctx.arcTo(x, y, x + w, y, r);
   ctx.closePath();
 }
+
+// ---------- 화면 위 떠 있는 안내창 (PiP 오버레이) ----------
+// 안내 단계를 그린 캔버스를 영상으로 바꿔 PiP(작은 창)로 띄운다.
+// PiP 창은 다른 앱 위에도 떠 있으므로, 설정·카카오톡을 쓰는 동안 안내가 따라다닌다.
+// 창의 이전(⏮)/다음(⏭) 버튼으로 단계를 넘긴다.
+const FLOAT_W = 640, FLOAT_H = 360;
+let floatSteps = [];
+let floatIdx = 0;
+let floatCanvas = null;
+let floatVideo = null;
+let floatTimer = null;
+
+function wrapCanvasText(ctx, text, maxWidth) {
+  const chars = text.split("");
+  const lines = [];
+  let line = "";
+  for (const ch of chars) {
+    if (ctx.measureText(line + ch).width > maxWidth && line) { lines.push(line); line = ch; }
+    else line += ch;
+  }
+  if (line) lines.push(line);
+  return lines;
+}
+
+function drawFloatStep() {
+  const ctx = floatCanvas.getContext("2d");
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, FLOAT_W, FLOAT_H);
+
+  // 상단 띠
+  ctx.fillStyle = "#3182f6";
+  ctx.fillRect(0, 0, FLOAT_W, 64);
+  ctx.fillStyle = "#ffffff";
+  ctx.font = "bold 30px sans-serif";
+  ctx.textAlign = "left";
+  ctx.fillText("AI 손주 따라하기", 24, 43);
+  ctx.textAlign = "right";
+  ctx.fillText(`${floatIdx + 1} / ${floatSteps.length}`, FLOAT_W - 24, 43);
+
+  // 단계 내용 (자동 줄바꿈)
+  ctx.fillStyle = "#191f28";
+  ctx.font = "bold 40px sans-serif";
+  ctx.textAlign = "left";
+  const lines = wrapCanvasText(ctx, floatSteps[floatIdx] || "", FLOAT_W - 60);
+  const lineH = 54;
+  let y = 130;
+  lines.slice(0, 4).forEach((l) => { ctx.fillText(l, 30, y); y += lineH; });
+
+  // 하단 안내
+  ctx.fillStyle = "#8b95a1";
+  ctx.font = "26px sans-serif";
+  ctx.fillText("창의 ⏮ ⏭ 버튼으로 단계를 넘기세요", 30, FLOAT_H - 26);
+}
+
+function setFloatIdx(idx) {
+  floatIdx = Math.min(Math.max(idx, 0), floatSteps.length - 1);
+  drawFloatStep();
+  speak(floatSteps[floatIdx]);
+}
+
+async function startFloatingGuide(steps) {
+  if (!steps || !steps.length) { toast("안내할 단계가 없어요"); return; }
+  if (!document.pictureInPictureEnabled) {
+    toast("이 브라우저는 화면 위 안내창을 지원하지 않아요. 크롬으로 열어보세요.");
+    return;
+  }
+  try {
+    floatSteps = steps;
+    floatIdx = 0;
+    if (!floatCanvas) {
+      floatCanvas = document.createElement("canvas");
+      floatCanvas.width = FLOAT_W;
+      floatCanvas.height = FLOAT_H;
+    }
+    drawFloatStep();
+
+    if (!floatVideo) {
+      floatVideo = document.createElement("video");
+      floatVideo.muted = true;
+      floatVideo.playsInline = true;
+      // display:none이면 PiP가 안 되므로 화면 밖에 숨겨둔다
+      floatVideo.style.cssText = "position:fixed;right:-9999px;bottom:0;width:1px;height:1px;";
+      document.body.appendChild(floatVideo);
+      floatVideo.addEventListener("leavepictureinpicture", stopFloatingGuide);
+    }
+    floatVideo.srcObject = floatCanvas.captureStream(2);
+    await floatVideo.play();
+    await floatVideo.requestPictureInPicture();
+
+    // 일부 기기에서 정지 화면이 멈춰 보이지 않도록 주기적으로 다시 그린다
+    clearInterval(floatTimer);
+    floatTimer = setInterval(drawFloatStep, 1000);
+
+    // PiP 창의 이전/다음 버튼으로 단계 이동
+    if ("mediaSession" in navigator) {
+      navigator.mediaSession.metadata = new MediaMetadata({ title: "AI 손주 따라하기" });
+      navigator.mediaSession.setActionHandler("previoustrack", () => setFloatIdx(floatIdx - 1));
+      navigator.mediaSession.setActionHandler("nexttrack", () => setFloatIdx(floatIdx + 1));
+    }
+    speak(`안내창을 띄웠어요. 이제 홈으로 나가서 따라해 보세요. 1번. ${floatSteps[0]}`);
+    toast("안내창이 떴어요! 홈 버튼을 눌러 나가도 계속 보여요.");
+  } catch (e) {
+    toast("화면 위 안내창을 띄우지 못했어요. 크롬 최신 버전에서 다시 해보세요.");
+  }
+}
+
+function stopFloatingGuide() {
+  clearInterval(floatTimer);
+  floatTimer = null;
+  if ("mediaSession" in navigator) {
+    try {
+      navigator.mediaSession.setActionHandler("previoustrack", null);
+      navigator.mediaSession.setActionHandler("nexttrack", null);
+    } catch (_) { /* 미지원 무시 */ }
+  }
+  if (floatVideo) floatVideo.pause();
+}
+
+$("phone-float").addEventListener("click", () => startFloatingGuide(currentPhoneSteps));
 
 $("phone-restart").addEventListener("click", () => {
   window.speechSynthesis.cancel();
