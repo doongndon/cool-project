@@ -88,6 +88,27 @@
   <symbol id="i-float" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <rect x="2" y="4" width="20" height="16" rx="2"/><rect x="12" y="12" width="7" height="5" rx="1" fill="currentColor" stroke="none"/>
   </symbol>
+  <symbol id="i-play" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <polygon points="6 3 20 12 6 21 6 3"/>
+  </symbol>
+  <symbol id="i-wifi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/>
+  </symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+  </symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+  </symbol>
+  <symbol id="i-globe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+  </symbol>
+  <symbol id="i-msg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+  </symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+  </symbol>
 </svg>
 
 <!-- ===== 홈 화면 ===== -->
@@ -127,6 +148,15 @@
       <span class="card-body">
         <span class="card-title">사기 검사</span>
         <span class="card-desc">수상한 문자, 전화 내용을 검사해드려요</span>
+      </span>
+      <svg class="ic card-chevron"><use href="#i-chevron"/></svg>
+    </button>
+
+    <button class="menu-card" data-go="practice">
+      <span class="card-ic orange"><svg class="ic"><use href="#i-play"/></svg></span>
+      <span class="card-body">
+        <span class="card-title">연습 모드</span>
+        <span class="card-desc">가상 폰 화면 위에서 직접 눌러보며 배워요</span>
       </span>
       <svg class="ic card-chevron"><use href="#i-chevron"/></svg>
     </button>
@@ -333,6 +363,175 @@
   </div>
 </section>
 
+<!-- ===== 연습 모드 (가상 폰) ===== -->
+<section id="screen-practice" class="screen">
+  <header class="screen-header">
+    <button class="back-btn" data-go="home" aria-label="처음으로"><svg class="ic"><use href="#i-back"/></svg></button>
+    <h2>연습 모드</h2>
+  </header>
+
+  <div id="practice-select" class="panel">
+    <p class="guide-text">가상 폰으로 안전하게 연습해요.<br><b>잘못 눌러도 괜찮아요!</b></p>
+    <button class="menu-card" data-scenario="font">
+      <span class="card-ic blue"><svg class="ic"><use href="#i-settings"/></svg></span>
+      <span class="card-body">
+        <span class="card-title">글자 크게 하기</span>
+        <span class="card-desc">설정에서 글자 크기를 키워봐요</span>
+      </span>
+      <svg class="ic card-chevron"><use href="#i-chevron"/></svg>
+    </button>
+    <button class="menu-card" data-scenario="kakao">
+      <span class="card-ic yellow"><svg class="ic"><use href="#i-logo"/></svg></span>
+      <span class="card-body">
+        <span class="card-title">카카오톡 사진 보내기</span>
+        <span class="card-desc">딸에게 사진을 보내봐요</span>
+      </span>
+      <svg class="ic card-chevron"><use href="#i-chevron"/></svg>
+    </button>
+    <button class="menu-card" data-scenario="wifi">
+      <span class="card-ic green"><svg class="ic"><use href="#i-wifi"/></svg></span>
+      <span class="card-body">
+        <span class="card-title">와이파이 연결하기</span>
+        <span class="card-desc">집 와이파이에 연결해봐요</span>
+      </span>
+      <svg class="ic card-chevron"><use href="#i-chevron"/></svg>
+    </button>
+  </div>
+
+  <div id="practice-run" class="panel hidden">
+    <div class="practice-banner">
+      <span id="pb-step" class="pb-step">1 / 4</span>
+      <p id="pb-text">설정 앱을 누르세요</p>
+    </div>
+
+    <div class="fp-phone" id="fp-phone">
+      <div class="fp-statusbar"><span>12:30</span><span>배터리 82%</span></div>
+
+      <!-- 홈 화면 -->
+      <div class="fp-screen active" id="fp-home">
+        <div class="fp-apps">
+          <button class="fp-app"><span class="fp-app-ic c1"><svg class="ic"><use href="#i-call"/></svg></span>전화</button>
+          <button class="fp-app"><span class="fp-app-ic c2"><svg class="ic"><use href="#i-msg"/></svg></span>메시지</button>
+          <button class="fp-app"><span class="fp-app-ic c3"><svg class="ic"><use href="#i-globe"/></svg></span>인터넷</button>
+          <button class="fp-app"><span class="fp-app-ic c4"><svg class="ic"><use href="#i-image"/></svg></span>갤러리</button>
+          <button class="fp-app" id="fp-app-kakao"><span class="fp-app-ic yellow"><svg class="ic"><use href="#i-logo"/></svg></span>카카오톡</button>
+          <button class="fp-app"><span class="fp-app-ic c5"><svg class="ic"><use href="#i-camera"/></svg></span>카메라</button>
+          <button class="fp-app"><span class="fp-app-ic c6"><svg class="ic"><use href="#i-clock"/></svg></span>시계</button>
+          <button class="fp-app" id="fp-app-settings"><span class="fp-app-ic c7"><svg class="ic"><use href="#i-settings"/></svg></span>설정</button>
+        </div>
+      </div>
+
+      <!-- 설정 메인 -->
+      <div class="fp-screen" id="fp-set-main">
+        <div class="fp-header">설정</div>
+        <button class="fp-row" id="fp-row-connect"><svg class="ic"><use href="#i-wifi"/></svg><span>연결<small>Wi-Fi, 블루투스</small></span></button>
+        <button class="fp-row"><svg class="ic"><use href="#i-speaker"/></svg><span>소리·진동</span></button>
+        <button class="fp-row"><svg class="ic"><use href="#i-bell"/></svg><span>알림</span></button>
+        <button class="fp-row" id="fp-row-display"><svg class="ic"><use href="#i-sun"/></svg><span>디스플레이<small>밝기, 글자 크기</small></span></button>
+        <button class="fp-row"><svg class="ic"><use href="#i-lock"/></svg><span>보안 및 개인정보</span></button>
+      </div>
+
+      <!-- 설정 > 디스플레이 -->
+      <div class="fp-screen" id="fp-set-display">
+        <div class="fp-header">디스플레이</div>
+        <button class="fp-row"><svg class="ic"><use href="#i-sun"/></svg><span>밝기</span></button>
+        <button class="fp-row" id="fp-row-fontsize"><span class="fp-aa">가A</span><span>글자 크기</span></button>
+        <button class="fp-row"><svg class="ic"><use href="#i-clock"/></svg><span>화면 자동 꺼짐</span></button>
+      </div>
+
+      <!-- 설정 > 글자 크기 -->
+      <div class="fp-screen" id="fp-set-fontsize">
+        <div class="fp-header">글자 크기</div>
+        <div class="fp-sample" id="fp-sample">안녕하세요.<br>미리보기 글자입니다.</div>
+        <div class="fp-sizes">
+          <button class="fp-size">작게</button>
+          <button class="fp-size on">보통</button>
+          <button class="fp-size" id="fp-size-large">크게</button>
+        </div>
+      </div>
+
+      <!-- 설정 > 연결 -->
+      <div class="fp-screen" id="fp-set-connect">
+        <div class="fp-header">연결</div>
+        <button class="fp-row" id="fp-row-wifi"><svg class="ic"><use href="#i-wifi"/></svg><span>Wi-Fi<small id="fp-wifi-state">꺼짐</small></span></button>
+        <button class="fp-row"><span class="fp-aa">B</span><span>블루투스</span></button>
+        <button class="fp-row"><svg class="ic"><use href="#i-phone"/></svg><span>모바일 데이터</span></button>
+      </div>
+
+      <!-- 설정 > Wi-Fi -->
+      <div class="fp-screen" id="fp-set-wifi">
+        <div class="fp-header">Wi-Fi</div>
+        <div class="fp-row fp-toggle-row">
+          <span>Wi-Fi 사용</span>
+          <button class="fp-switch" id="fp-wifi-switch" aria-label="와이파이 켜기"><span class="knob"></span></button>
+        </div>
+        <div id="fp-wifi-list" class="hidden">
+          <button class="fp-row" id="fp-wifi-home"><svg class="ic"><use href="#i-wifi"/></svg><span>우리집 공유기<small id="fp-wifi-home-state">잠김</small></span></button>
+          <button class="fp-row"><svg class="ic"><use href="#i-wifi"/></svg><span>KT_GiGA_5G</span></button>
+          <button class="fp-row"><svg class="ic"><use href="#i-wifi"/></svg><span>iptime2.4G</span></button>
+        </div>
+      </div>
+
+      <!-- 카카오톡 채팅 목록 -->
+      <div class="fp-screen" id="fp-kakao-list">
+        <div class="fp-header kakao">채팅</div>
+        <button class="fp-row" id="fp-kakao-daughter"><span class="fp-avatar a1">딸</span><span>사랑하는 딸<small>엄마 식사하셨어요?</small></span></button>
+        <button class="fp-row"><span class="fp-avatar a2">아</span><span>아들<small>주말에 갈게요</small></span></button>
+        <button class="fp-row"><span class="fp-avatar a3">가</span><span>우리 가족<small>사진 고마워요!</small></span></button>
+      </div>
+
+      <!-- 카카오톡 채팅방 -->
+      <div class="fp-screen" id="fp-kakao-room">
+        <div class="fp-header kakao">사랑하는 딸</div>
+        <div class="fp-msgs" id="fp-msgs">
+          <div class="fp-bubble them">엄마 식사하셨어요?</div>
+          <div class="fp-bubble me">그럼~ 너는?</div>
+        </div>
+        <div class="fp-chatbar">
+          <button class="fp-plus" id="fp-kakao-plus">+</button>
+          <span class="fp-fakeinput">메시지 입력</span>
+          <button class="fp-send">전송</button>
+        </div>
+      </div>
+
+      <!-- 카카오톡 첨부 선택 -->
+      <div class="fp-screen" id="fp-kakao-attach">
+        <div class="fp-header kakao">사랑하는 딸</div>
+        <div class="fp-sheet">
+          <button class="fp-sheet-item" id="fp-attach-album"><svg class="ic"><use href="#i-image"/></svg>앨범</button>
+          <button class="fp-sheet-item"><svg class="ic"><use href="#i-camera"/></svg>카메라</button>
+          <button class="fp-sheet-item"><svg class="ic"><use href="#i-doc"/></svg>파일</button>
+        </div>
+      </div>
+
+      <!-- 앨범 -->
+      <div class="fp-screen" id="fp-kakao-album">
+        <div class="fp-header">앨범</div>
+        <div class="fp-photos">
+          <button class="fp-photo p1" id="fp-photo-1"></button>
+          <button class="fp-photo p2"></button>
+          <button class="fp-photo p3"></button>
+          <button class="fp-photo p4"></button>
+          <button class="fp-photo p5"></button>
+          <button class="fp-photo p6"></button>
+        </div>
+        <button class="fp-album-send" id="fp-album-send">전송</button>
+      </div>
+
+      <!-- 완료 축하 -->
+      <div id="fp-congrats" class="fp-congrats hidden">
+        <svg class="ic congrats-ic"><use href="#i-check"/></svg>
+        <p class="congrats-title">참 잘하셨어요!</p>
+        <p id="congrats-desc" class="congrats-desc"></p>
+        <button id="practice-again" class="big-btn primary">다시 연습하기</button>
+        <button id="practice-other" class="big-btn">다른 연습 고르기</button>
+      </div>
+    </div>
+
+    <button id="practice-exit" class="big-btn">연습 끝내기</button>
+  </div>
+</section>
+
 <!-- ===== 지난 기록 화면 ===== -->
 <section id="screen-history" class="screen">
   <header class="screen-header">
@@ -377,5 +576,6 @@
 
 <script src="config.js" onerror="void 0"></script>
 <script src="js/app.js"></script>
+<script src="js/practice.js"></script>
 </body>
 </html>
