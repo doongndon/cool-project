@@ -52,7 +52,8 @@ function toast(msg, ms = 3500) {
 
 // ---------- API 키 ----------
 function getKey() {
-  return localStorage.getItem(KEY_STORAGE) || "";
+  // 저장된 키가 없으면 config.js(로컬 전용, git 제외)의 기본 키를 사용
+  return localStorage.getItem(KEY_STORAGE) || window.AI_SONJU_DEFAULT_KEY || "";
 }
 function openSettings() {
   $("api-key-input").value = getKey();
@@ -65,7 +66,7 @@ $("save-key").addEventListener("click", () => {
   if (!key) { toast("키를 입력해주세요"); return; }
   localStorage.setItem(KEY_STORAGE, key);
   $("settings-modal").classList.add("hidden");
-  toast("저장했어요! 이제 사용하실 수 있어요 😊");
+  toast("저장했어요! 이제 사용하실 수 있어요");
 });
 function requireKey() {
   if (!getKey()) {
@@ -115,11 +116,17 @@ async function callGemini(parts, { json = true } = {}) {
     // 무료 사용량 초과(429)는 잠깐 쉬었다 자동으로 한 번 더 시도한다
     for (let attempt = 0; attempt < 2; attempt++) {
       try {
-        const res = await fetch(`${API_BASE}/${model}:generateContent?key=${encodeURIComponent(key)}`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body),
-        });
+        let res;
+        try {
+          res = await fetch(`${API_BASE}/${model}:generateContent?key=${encodeURIComponent(key)}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body),
+          });
+        } catch (_) {
+          // fetch 자체가 실패하면 영어 오류 대신 쉬운 안내를 보여준다
+          throw new Error("인터넷 연결이 안 되는 것 같아요. 와이파이나 데이터를 확인하고 다시 눌러주세요.");
+        }
         if (res.status === 404) { lastErr = new Error("model-not-found"); break; }
         if (res.status === 429) {
           if (attempt === 0) { toast("사용량이 많아 잠시 기다렸다 다시 해볼게요..."); await sleep(3000); continue; }
@@ -192,7 +199,7 @@ function startDictation(inputEl, micBtn) {
   rec.lang = "ko-KR";
   rec.interimResults = false;
   micBtn.classList.add("listening");
-  toast("듣고 있어요, 말씀하세요 🎤");
+  toast("듣고 있어요, 말씀하세요");
   rec.onresult = (e) => { inputEl.value = e.results[0][0].transcript; };
   rec.onend = () => micBtn.classList.remove("listening");
   rec.onerror = () => { micBtn.classList.remove("listening"); toast("잘 못 들었어요. 다시 눌러주세요."); };
@@ -236,7 +243,7 @@ async function analyzeDoc(file) {
     $("doc-type").textContent = result.doc_type || "";
     $("doc-summary").textContent = result.summary || "";
 
-    fillList("doc-warnings", result.warnings, "특별히 조심할 내용은 없어 보여요 😊");
+    fillList("doc-warnings", result.warnings, "특별히 조심할 내용은 없어 보여요");
     fillList("doc-mustknow", result.must_know, "-");
 
     const dl = $("doc-words");
@@ -340,7 +347,7 @@ let phoneShotFile = null;
 
 $("phone-shot").addEventListener("change", (e) => {
   phoneShotFile = e.target.files[0] || null;
-  $("phone-shot-name").textContent = phoneShotFile ? `✅ 화면 캡처 준비 완료: ${phoneShotFile.name}` : "";
+  $("phone-shot-name").textContent = phoneShotFile ? `화면 캡처 준비 완료: ${phoneShotFile.name}` : "";
 });
 
 document.querySelectorAll(".example-chip").forEach((chip) => {
@@ -437,10 +444,28 @@ function drawTapMarker(img, tap) {
     ctx.arc(cx, cy, r, 0, Math.PI * 2);
     ctx.stroke();
 
-    // 손가락 이모지와 라벨
-    ctx.font = `${Math.round(canvas.width * 0.1)}px sans-serif`;
+    // 원 아래에서 위로 가리키는 화살표 (이모지 대신 직접 그림)
+    const arrowTop = cy + r + 6;
+    const arrowLen = Math.min(canvas.width * 0.13, canvas.height - arrowTop - 10);
+    if (arrowLen > 20) {
+      const headH = arrowLen * 0.45;
+      const headW = headH * 0.9;
+      ctx.fillStyle = "#e53e3e";
+      ctx.strokeStyle = "#e53e3e";
+      ctx.beginPath(); // 화살촉
+      ctx.moveTo(cx, arrowTop);
+      ctx.lineTo(cx - headW / 2, arrowTop + headH);
+      ctx.lineTo(cx + headW / 2, arrowTop + headH);
+      ctx.closePath();
+      ctx.fill();
+      ctx.lineWidth = Math.max(6, canvas.width * 0.018); // 화살대
+      ctx.lineCap = "round";
+      ctx.beginPath();
+      ctx.moveTo(cx, arrowTop + headH);
+      ctx.lineTo(cx, arrowTop + arrowLen);
+      ctx.stroke();
+    }
     ctx.textAlign = "center";
-    ctx.fillText("👆", cx, Math.min(cy + r + canvas.width * 0.11, canvas.height - 8));
 
     if (tap.label) {
       const fontSize = Math.round(canvas.width * 0.045);
@@ -504,16 +529,16 @@ ${text ? `어르신이 받은 문자나 전화 내용: "${text}"` : "첨부된 �
 }`;
 
 const VERDICT_STYLE = {
-  danger: { emoji: "🚨", cls: "danger", fallbackTitle: "사기일 가능성이 매우 높아요!" },
-  warning: { emoji: "⚠️", cls: "warning", fallbackTitle: "사기일 수 있어요. 조심하세요!" },
-  safe: { emoji: "✅", cls: "safe", fallbackTitle: "사기 신호는 보이지 않아요" },
+  danger: { icon: "#i-danger", cls: "danger", fallbackTitle: "사기일 가능성이 매우 높아요!" },
+  warning: { icon: "#i-warn", cls: "warning", fallbackTitle: "사기일 수 있어요. 조심하세요!" },
+  safe: { icon: "#i-check", cls: "safe", fallbackTitle: "사기 신호는 보이지 않아요" },
 };
 
 let scamShotFile = null;
 
 $("scam-shot").addEventListener("change", (e) => {
   scamShotFile = e.target.files[0] || null;
-  $("scam-shot-name").textContent = scamShotFile ? `✅ 캡처 준비 완료: ${scamShotFile.name}` : "";
+  $("scam-shot-name").textContent = scamShotFile ? `캡처 준비 완료: ${scamShotFile.name}` : "";
 });
 
 $("scam-check").addEventListener("click", async () => {
@@ -536,7 +561,7 @@ $("scam-check").addEventListener("click", async () => {
     const style = VERDICT_STYLE[result.verdict] || VERDICT_STYLE.warning;
     const verdictEl = $("scam-verdict");
     verdictEl.className = "verdict-card " + style.cls;
-    $("scam-verdict-emoji").textContent = style.emoji;
+    $("scam-verdict-use").setAttribute("href", style.icon);
     $("scam-verdict-title").textContent = result.title || style.fallbackTitle;
 
     fillList("scam-reasons", result.reasons, "-");

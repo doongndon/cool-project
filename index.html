@@ -5,38 +5,108 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#2b6cb0">
 <title>AI 손주 - 어르신 디지털 도우미</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧑‍🦳</text></svg>">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232b6cb0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z'/%3E%3Cpath d='M12 8.6c-1-1.2-2.8-1.3-3.7-.2-.8.9-.7 2.3.1 3.2l3.6 3.6 3.6-3.6c.8-.9.9-2.3.1-3.2-.9-1.1-2.7-1-3.7.2z' fill='%23e05e00' stroke='none'/%3E%3C/svg%3E">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
+<!-- ===== SVG 아이콘 모음 (Feather 스타일, stroke 기반) ===== -->
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+  <symbol id="i-logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+    <path d="M12 8.6c-1-1.2-2.8-1.3-3.7-.2-.8.9-.7 2.3.1 3.2l3.6 3.6 3.6-3.6c.8-.9.9-2.3.1-3.2-.9-1.1-2.7-1-3.7.2z" fill="currentColor" stroke="none"/>
+  </symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+    <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
+  </symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/>
+  </symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+  </symbol>
+  <symbol id="i-speaker" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>
+  </symbol>
+  <symbol id="i-mic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+    <line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/>
+  </symbol>
+  <symbol id="i-camera" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>
+  </symbol>
+  <symbol id="i-image" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+  </symbol>
+  <symbol id="i-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="3"/>
+    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+  </symbol>
+  <symbol id="i-back" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+  </symbol>
+  <symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+  </symbol>
+  <symbol id="i-warn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+    <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+  </symbol>
+  <symbol id="i-danger" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86"/>
+    <line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+  </symbol>
+  <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+  </symbol>
+  <symbol id="i-call" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+  </symbol>
+  <symbol id="i-redo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+  </symbol>
+  <symbol id="i-help" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+  </symbol>
+</svg>
+
 <!-- ===== 홈 화면 ===== -->
 <section id="screen-home" class="screen active">
   <header class="home-header">
-    <h1>🧑‍🦳 AI 손주</h1>
+    <div class="logo-row">
+      <svg class="ic logo-ic"><use href="#i-logo"/></svg>
+      <h1>AI 손주</h1>
+    </div>
     <p class="subtitle">손주처럼 친절하게 알려드려요</p>
-    <button id="btn-settings" class="icon-btn" aria-label="설정">⚙️</button>
+    <button id="btn-settings" class="icon-btn" aria-label="설정"><svg class="ic"><use href="#i-settings"/></svg></button>
   </header>
 
   <div class="menu-cards">
     <button class="menu-card" data-go="doc">
-      <span class="card-emoji">📄</span>
-      <span class="card-title">어려운 서류 풀이</span>
-      <span class="card-desc">계약서, 고지서, 안내문을<br>사진 찍으면 쉽게 설명해요</span>
+      <span class="card-ic blue"><svg class="ic"><use href="#i-doc"/></svg></span>
+      <span class="card-body">
+        <span class="card-title">어려운 서류 풀이</span>
+        <span class="card-desc">계약서, 고지서를 사진 찍으면 쉽게 설명해요</span>
+      </span>
     </button>
 
     <button class="menu-card" data-go="phone">
-      <span class="card-emoji">📱</span>
-      <span class="card-title">폰 사용법 알려줘</span>
-      <span class="card-desc">화면을 보여주시면<br>"여기를 누르세요" 알려드려요</span>
+      <span class="card-ic green"><svg class="ic"><use href="#i-phone"/></svg></span>
+      <span class="card-body">
+        <span class="card-title">폰 사용법 알려줘</span>
+        <span class="card-desc">화면을 보여주시면 "여기를 누르세요" 알려드려요</span>
+      </span>
     </button>
 
-    <button class="menu-card scam" data-go="scam">
-      <span class="card-emoji">🚨</span>
-      <span class="card-title">사기 아닐까?</span>
-      <span class="card-desc">수상한 문자·전화 내용을<br>검사해드려요</span>
+    <button class="menu-card" data-go="scam">
+      <span class="card-ic red"><svg class="ic"><use href="#i-shield"/></svg></span>
+      <span class="card-body">
+        <span class="card-title">사기 아닐까?</span>
+        <span class="card-desc">수상한 문자, 전화 내용을 검사해드려요</span>
+      </span>
     </button>
   </div>
 
@@ -51,15 +121,15 @@
 <!-- ===== 서류 풀이 화면 ===== -->
 <section id="screen-doc" class="screen">
   <header class="screen-header">
-    <button class="back-btn" data-go="home">← 처음으로</button>
-    <h2>📄 어려운 서류 풀이</h2>
+    <button class="back-btn" data-go="home" aria-label="처음으로"><svg class="ic"><use href="#i-back"/></svg></button>
+    <h2>어려운 서류 풀이</h2>
   </header>
 
   <div id="doc-start" class="panel">
     <p class="guide-text">계약서나 고지서를<br><b>사진으로 찍어주세요</b></p>
-    <label class="big-btn primary" for="doc-camera">📷 사진 찍기</label>
+    <label class="big-btn primary" for="doc-camera"><svg class="ic"><use href="#i-camera"/></svg> 사진 찍기</label>
     <input type="file" id="doc-camera" accept="image/*" capture="environment" hidden>
-    <label class="big-btn" for="doc-file">🖼️ 앨범에서 고르기</label>
+    <label class="big-btn" for="doc-file"><svg class="ic"><use href="#i-image"/></svg> 앨범에서 고르기</label>
     <input type="file" id="doc-file" accept="image/*" hidden>
   </div>
 
@@ -70,26 +140,26 @@
 
   <div id="doc-result" class="panel hidden">
     <img id="doc-preview" class="doc-preview" alt="찍은 서류 사진">
-    <button id="doc-tts" class="big-btn speak">🔊 소리로 들려줘</button>
+    <button id="doc-tts" class="big-btn speak"><svg class="ic"><use href="#i-speaker"/></svg> 소리로 들려줘</button>
 
     <div class="result-card">
-      <h3>📌 이 서류는요</h3>
+      <h3>이 서류는요</h3>
       <p id="doc-type"></p>
     </div>
     <div class="result-card">
-      <h3>💬 쉬운 말 요약</h3>
+      <h3>쉬운 말 요약</h3>
       <p id="doc-summary"></p>
     </div>
     <div class="result-card important">
-      <h3>⚠️ 조심하세요!</h3>
+      <h3><svg class="ic"><use href="#i-warn"/></svg> 조심하세요!</h3>
       <ul id="doc-warnings"></ul>
     </div>
     <div class="result-card">
-      <h3>✅ 꼭 알아두세요</h3>
+      <h3><svg class="ic"><use href="#i-check"/></svg> 꼭 알아두세요</h3>
       <ul id="doc-mustknow"></ul>
     </div>
     <div class="result-card">
-      <h3>📖 어려운 말 풀이</h3>
+      <h3>어려운 말 풀이</h3>
       <dl id="doc-words"></dl>
     </div>
 
@@ -97,36 +167,36 @@
       <p class="guide-text">더 궁금한 게 있으세요?</p>
       <div class="ask-row">
         <input type="text" id="doc-question" placeholder="예: 위약금이 얼마예요?">
-        <button id="doc-mic" class="mic-btn" aria-label="음성으로 질문">🎤</button>
+        <button id="doc-mic" class="mic-btn" aria-label="음성으로 질문"><svg class="ic"><use href="#i-mic"/></svg></button>
       </div>
       <button id="doc-ask" class="big-btn primary">질문하기</button>
       <div id="doc-answer" class="result-card hidden">
-        <h3>👧 AI 손주의 대답</h3>
+        <h3><svg class="ic"><use href="#i-help"/></svg> AI 손주의 대답</h3>
         <p id="doc-answer-text"></p>
-        <button id="doc-answer-tts" class="big-btn speak">🔊 소리로 들려줘</button>
+        <button id="doc-answer-tts" class="big-btn speak"><svg class="ic"><use href="#i-speaker"/></svg> 소리로 들려줘</button>
       </div>
     </div>
 
-    <button class="big-btn" id="doc-restart">📷 다른 서류 찍기</button>
+    <button class="big-btn" id="doc-restart"><svg class="ic"><use href="#i-redo"/></svg> 다른 서류 찍기</button>
   </div>
 </section>
 
 <!-- ===== 폰 사용법 화면 ===== -->
 <section id="screen-phone" class="screen">
   <header class="screen-header">
-    <button class="back-btn" data-go="home">← 처음으로</button>
-    <h2>📱 폰 사용법 알려줘</h2>
+    <button class="back-btn" data-go="home" aria-label="처음으로"><svg class="ic"><use href="#i-back"/></svg></button>
+    <h2>폰 사용법 알려줘</h2>
   </header>
 
   <div id="phone-start" class="panel">
     <p class="guide-text">무엇이 어려우세요?<br>말로 하셔도 돼요</p>
     <div class="ask-row">
       <input type="text" id="phone-question" placeholder="예: 카카오톡으로 사진 보내는 법">
-      <button id="phone-mic" class="mic-btn" aria-label="음성으로 질문">🎤</button>
+      <button id="phone-mic" class="mic-btn" aria-label="음성으로 질문"><svg class="ic"><use href="#i-mic"/></svg></button>
     </div>
 
     <p class="guide-text small">지금 보고 있는 화면을 캡처해서 올려주시면<br><b>"여기를 누르세요"</b> 하고 짚어드려요 (선택)</p>
-    <label class="big-btn" for="phone-shot">🖼️ 화면 캡처 올리기</label>
+    <label class="big-btn" for="phone-shot"><svg class="ic"><use href="#i-image"/></svg> 화면 캡처 올리기</label>
     <input type="file" id="phone-shot" accept="image/*" hidden>
     <p id="phone-shot-name" class="file-name"></p>
 
@@ -147,41 +217,41 @@
   </div>
 
   <div id="phone-result" class="panel hidden">
-    <button id="phone-tts" class="big-btn speak">🔊 소리로 들려줘</button>
+    <button id="phone-tts" class="big-btn speak"><svg class="ic"><use href="#i-speaker"/></svg> 소리로 들려줘</button>
 
     <div class="result-card">
-      <h3>👧 AI 손주의 대답</h3>
+      <h3><svg class="ic"><use href="#i-help"/></svg> AI 손주의 대답</h3>
       <p id="phone-answer"></p>
     </div>
 
     <div id="phone-canvas-wrap" class="canvas-wrap hidden">
-      <h3 class="canvas-title">👇 여기를 누르세요!</h3>
+      <h3 class="canvas-title">여기를 누르세요!</h3>
       <canvas id="phone-canvas"></canvas>
     </div>
 
     <div class="result-card">
-      <h3>📋 순서대로 따라하세요</h3>
+      <h3>순서대로 따라하세요</h3>
       <ol id="phone-steps" class="step-list"></ol>
     </div>
 
-    <button class="big-btn" id="phone-restart">🙋 다른 것 물어보기</button>
+    <button class="big-btn" id="phone-restart"><svg class="ic"><use href="#i-redo"/></svg> 다른 것 물어보기</button>
   </div>
 </section>
 
 <!-- ===== 사기 검사 화면 ===== -->
 <section id="screen-scam" class="screen">
   <header class="screen-header">
-    <button class="back-btn" data-go="home">← 처음으로</button>
-    <h2>🚨 사기 아닐까?</h2>
+    <button class="back-btn" data-go="home" aria-label="처음으로"><svg class="ic"><use href="#i-back"/></svg></button>
+    <h2>사기 아닐까?</h2>
   </header>
 
   <div id="scam-start" class="panel">
     <p class="guide-text">수상한 <b>문자 내용을 붙여넣거나</b><br>문자 화면을 <b>캡처해서 올려주세요</b></p>
     <textarea id="scam-text" rows="4" placeholder="예: [Web발신] 아들이에요. 폰이 고장나서 그러는데 이 링크로..."></textarea>
-    <label class="big-btn" for="scam-shot">🖼️ 문자 화면 캡처 올리기</label>
+    <label class="big-btn" for="scam-shot"><svg class="ic"><use href="#i-image"/></svg> 문자 화면 캡처 올리기</label>
     <input type="file" id="scam-shot" accept="image/*" hidden>
     <p id="scam-shot-name" class="file-name"></p>
-    <button id="scam-check" class="big-btn primary">🔍 사기인지 검사하기</button>
+    <button id="scam-check" class="big-btn primary"><svg class="ic"><use href="#i-search"/></svg> 사기인지 검사하기</button>
     <p class="guide-text small">전화로 들은 이야기도 적어서 검사할 수 있어요.<br>예: "검찰청이라며 계좌가 범죄에 연루됐다고 해요"</p>
   </div>
 
@@ -192,21 +262,21 @@
 
   <div id="scam-result" class="panel hidden">
     <div id="scam-verdict" class="verdict-card">
-      <span id="scam-verdict-emoji" class="verdict-emoji"></span>
+      <svg class="ic verdict-ic"><use id="scam-verdict-use" href="#i-warn"/></svg>
       <span id="scam-verdict-title" class="verdict-title"></span>
     </div>
-    <button id="scam-tts" class="big-btn speak">🔊 소리로 들려줘</button>
+    <button id="scam-tts" class="big-btn speak"><svg class="ic"><use href="#i-speaker"/></svg> 소리로 들려줘</button>
 
     <div class="result-card">
-      <h3>🔎 왜 그런가요?</h3>
+      <h3><svg class="ic"><use href="#i-search"/></svg> 왜 그런가요?</h3>
       <ul id="scam-reasons"></ul>
     </div>
     <div class="result-card important">
-      <h3>🙅 이렇게 하세요</h3>
+      <h3><svg class="ic"><use href="#i-warn"/></svg> 이렇게 하세요</h3>
       <ul id="scam-advice"></ul>
     </div>
     <div class="result-card">
-      <h3>📞 도움 받을 곳</h3>
+      <h3><svg class="ic"><use href="#i-call"/></svg> 도움 받을 곳</h3>
       <ul>
         <li>경찰 <a href="tel:112"><b>112</b></a> — 사기 신고</li>
         <li>금융감독원 <a href="tel:1332"><b>1332</b></a> — 돈을 보냈다면 즉시!</li>
@@ -214,17 +284,17 @@
       </ul>
     </div>
 
-    <button class="big-btn" id="scam-restart">🔍 다른 문자 검사하기</button>
+    <button class="big-btn" id="scam-restart"><svg class="ic"><use href="#i-redo"/></svg> 다른 문자 검사하기</button>
   </div>
 </section>
 
 <!-- ===== 설정 모달 ===== -->
 <div id="settings-modal" class="modal hidden">
   <div class="modal-box">
-    <h2>⚙️ 처음 한 번만 설정</h2>
+    <h2>처음 한 번만 설정</h2>
     <p class="guide-text small">
       무료 Gemini 열쇠(API 키)가 필요해요.<br>
-      <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">👉 여기서 무료로 발급받기</a><br>
+      <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">여기서 무료로 발급받기</a><br>
       (구글 계정으로 로그인 → "API 키 만들기" 누르기)
     </p>
     <input type="password" id="api-key-input" placeholder="발급받은 키를 여기에 붙여넣기">
@@ -237,6 +307,7 @@
 <!-- ===== 알림 토스트 ===== -->
 <div id="toast" class="toast hidden"></div>
 
+<script src="config.js" onerror="void 0"></script>
 <script src="js/app.js"></script>
 </body>
 </html>
