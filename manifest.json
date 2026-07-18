@@ -1,0 +1,14 @@
+{
+  "name": "AI 손주 - 어르신 디지털 도우미",
+  "short_name": "AI 손주",
+  "description": "손주처럼 친절하게 서류 풀이, 폰 사용법, 사기 검사를 도와드려요",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#f5f7fa",
+  "theme_color": "#2b6cb0",
+  "lang": "ko",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

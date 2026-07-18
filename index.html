@@ -6,6 +6,8 @@
 <meta name="theme-color" content="#2b6cb0">
 <title>AI 손주 - 어르신 디지털 도우미</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧑‍🦳</text></svg>">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -29,6 +31,12 @@
       <span class="card-emoji">📱</span>
       <span class="card-title">폰 사용법 알려줘</span>
       <span class="card-desc">화면을 보여주시면<br>"여기를 누르세요" 알려드려요</span>
+    </button>
+
+    <button class="menu-card scam" data-go="scam">
+      <span class="card-emoji">🚨</span>
+      <span class="card-title">사기 아닐까?</span>
+      <span class="card-desc">수상한 문자·전화 내용을<br>검사해드려요</span>
     </button>
   </div>
 
@@ -157,6 +165,56 @@
     </div>
 
     <button class="big-btn" id="phone-restart">🙋 다른 것 물어보기</button>
+  </div>
+</section>
+
+<!-- ===== 사기 검사 화면 ===== -->
+<section id="screen-scam" class="screen">
+  <header class="screen-header">
+    <button class="back-btn" data-go="home">← 처음으로</button>
+    <h2>🚨 사기 아닐까?</h2>
+  </header>
+
+  <div id="scam-start" class="panel">
+    <p class="guide-text">수상한 <b>문자 내용을 붙여넣거나</b><br>문자 화면을 <b>캡처해서 올려주세요</b></p>
+    <textarea id="scam-text" rows="4" placeholder="예: [Web발신] 아들이에요. 폰이 고장나서 그러는데 이 링크로..."></textarea>
+    <label class="big-btn" for="scam-shot">🖼️ 문자 화면 캡처 올리기</label>
+    <input type="file" id="scam-shot" accept="image/*" hidden>
+    <p id="scam-shot-name" class="file-name"></p>
+    <button id="scam-check" class="big-btn primary">🔍 사기인지 검사하기</button>
+    <p class="guide-text small">전화로 들은 이야기도 적어서 검사할 수 있어요.<br>예: "검찰청이라며 계좌가 범죄에 연루됐다고 해요"</p>
+  </div>
+
+  <div id="scam-loading" class="panel hidden">
+    <div class="spinner"></div>
+    <p class="guide-text">사기 수법인지 꼼꼼히 살펴보고 있어요...</p>
+  </div>
+
+  <div id="scam-result" class="panel hidden">
+    <div id="scam-verdict" class="verdict-card">
+      <span id="scam-verdict-emoji" class="verdict-emoji"></span>
+      <span id="scam-verdict-title" class="verdict-title"></span>
+    </div>
+    <button id="scam-tts" class="big-btn speak">🔊 소리로 들려줘</button>
+
+    <div class="result-card">
+      <h3>🔎 왜 그런가요?</h3>
+      <ul id="scam-reasons"></ul>
+    </div>
+    <div class="result-card important">
+      <h3>🙅 이렇게 하세요</h3>
+      <ul id="scam-advice"></ul>
+    </div>
+    <div class="result-card">
+      <h3>📞 도움 받을 곳</h3>
+      <ul>
+        <li>경찰 <a href="tel:112"><b>112</b></a> — 사기 신고</li>
+        <li>금융감독원 <a href="tel:1332"><b>1332</b></a> — 돈을 보냈다면 즉시!</li>
+        <li>스팸 신고 <a href="tel:118"><b>118</b></a></li>
+      </ul>
+    </div>
+
+    <button class="big-btn" id="scam-restart">🔍 다른 문자 검사하기</button>
   </div>
 </section>
 

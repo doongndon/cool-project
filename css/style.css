@@ -64,6 +64,10 @@ body {
 .card-title { font-size: 1.45rem; font-weight: 800; color: var(--blue-dark); }
 .card-desc { font-size: 1rem; color: var(--text-sub); }
 
+.menu-card.scam { border-color: var(--red); }
+.menu-card.scam .card-title { color: var(--red); }
+.menu-card.scam:active { background: #fff5f5; }
+
 .font-size-row {
   display: flex; align-items: center; justify-content: center; gap: 0.5rem;
   padding: 0.5rem 1rem; font-size: 0.95rem; color: var(--text-sub); flex-wrap: wrap;
@@ -182,6 +186,25 @@ body {
 
 .step-list li { font-size: 1.1rem; margin-bottom: 0.7rem; }
 .step-list li::marker { font-weight: 800; color: var(--blue); }
+
+/* ===== 사기 검사 ===== */
+#scam-text {
+  width: 100%; font-size: 1.1rem; padding: 0.9rem;
+  border: 3px solid var(--red); border-radius: 16px;
+  font-family: inherit; resize: vertical;
+}
+.verdict-card {
+  display: flex; flex-direction: column; align-items: center; gap: 0.3rem;
+  border-radius: 18px; padding: 1.3rem; text-align: center;
+  border: 4px solid #a0aec0; background: #edf2f7;
+}
+.verdict-emoji { font-size: 3rem; }
+.verdict-title { font-size: 1.4rem; font-weight: 900; }
+.verdict-card.danger { border-color: var(--red); background: #fff5f5; color: var(--red); }
+.verdict-card.warning { border-color: var(--orange); background: #fffaf0; color: var(--orange); }
+.verdict-card.safe { border-color: var(--green); background: #f0fff4; color: var(--green); }
+.result-card a { color: inherit; text-decoration: none; }
+.result-card a b { font-size: 1.2em; color: var(--blue); text-decoration: underline; }
 
 /* ===== 모달 ===== */
 .modal {

@@ -25,14 +25,20 @@ document.querySelectorAll("[data-go]").forEach((btn) => {
   btn.addEventListener("click", () => goScreen(btn.dataset.go));
 });
 
-// ---------- 글자 크기 ----------
+// ---------- 글자 크기 (선택을 저장해서 다음에도 유지) ----------
+const FONT_STORAGE = "ai_sonju_font_scale";
+function applyFontScale(scale) {
+  document.documentElement.style.setProperty("--scale", scale);
+  document.querySelectorAll(".font-btn").forEach((b) =>
+    b.classList.toggle("active", b.dataset.scale === scale));
+}
 document.querySelectorAll(".font-btn").forEach((btn) => {
   btn.addEventListener("click", () => {
-    document.querySelectorAll(".font-btn").forEach((b) => b.classList.remove("active"));
-    btn.classList.add("active");
-    document.documentElement.style.setProperty("--scale", btn.dataset.scale);
+    localStorage.setItem(FONT_STORAGE, btn.dataset.scale);
+    applyFontScale(btn.dataset.scale);
   });
 });
+applyFontScale(localStorage.getItem(FONT_STORAGE) || "1.15");
 
 // ---------- 토스트 ----------
 let toastTimer = null;
@@ -89,12 +95,14 @@ function fileToResizedBase64(file, maxSize = 1280) {
       const dataUrl = canvas.toDataURL("image/jpeg", 0.88);
       resolve({ base64: dataUrl.split(",")[1], dataUrl, width, height });
     };
-    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("이미지를 읽지 못했어요")); };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("사진 형식을 읽지 못했어요. 화면 캡처(스크린샷)나 일반 사진(JPG)을 올려주세요.")); };
     img.src = url;
   });
 }
 
 // ---------- Gemini 호출 ----------
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
 async function callGemini(parts, { json = true } = {}) {
   const key = getKey();
   const body = {
@@ -104,49 +112,77 @@ async function callGemini(parts, { json = true } = {}) {
 
   let lastErr = null;
   for (const model of MODELS) {
-    try {
-      const res = await fetch(`${API_BASE}/${model}:generateContent?key=${encodeURIComponent(key)}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-      if (res.status === 404) { lastErr = new Error("model-not-found"); continue; }
-      if (res.status === 429) throw new Error("무료 사용량을 잠시 다 썼어요. 1분 뒤에 다시 눌러주세요.");
-      if (res.status === 400 || res.status === 403) {
-        const detail = await res.json().catch(() => ({}));
-        const msg = detail?.error?.message || "";
-        if (/api key/i.test(msg)) throw new Error("키가 올바르지 않아요. 설정(⚙️)에서 다시 붙여넣어 주세요.");
-        lastErr = new Error(msg || "요청이 거절되었어요");
-        continue;
-      }
-      if (!res.ok) throw new Error(`서버 오류(${res.status})가 났어요. 다시 한 번 눌러주세요.`);
+    // 무료 사용량 초과(429)는 잠깐 쉬었다 자동으로 한 번 더 시도한다
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        const res = await fetch(`${API_BASE}/${model}:generateContent?key=${encodeURIComponent(key)}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        if (res.status === 404) { lastErr = new Error("model-not-found"); break; }
+        if (res.status === 429) {
+          if (attempt === 0) { toast("사용량이 많아 잠시 기다렸다 다시 해볼게요..."); await sleep(3000); continue; }
+          throw new Error("무료 사용량을 잠시 다 썼어요. 1분 뒤에 다시 눌러주세요.");
+        }
+        if (res.status === 400 || res.status === 403) {
+          const detail = await res.json().catch(() => ({}));
+          const msg = detail?.error?.message || "";
+          if (/api key/i.test(msg)) throw new Error("키가 올바르지 않아요. 설정(⚙️)에서 다시 붙여넣어 주세요.");
+          lastErr = new Error("요청이 거절되었어요. 다시 한 번 눌러주세요.");
+          break;
+        }
+        if (!res.ok) throw new Error(`서버 오류(${res.status})가 났어요. 다시 한 번 눌러주세요.`);
 
-      const data = await res.json();
-      const text = data?.candidates?.[0]?.content?.parts?.map((p) => p.text || "").join("") || "";
-      if (!text) throw new Error("답을 받지 못했어요. 다시 한 번 눌러주세요.");
-      return json ? JSON.parse(cleanJson(text)) : text;
-    } catch (e) {
-      if (e.message === "model-not-found") { lastErr = e; continue; }
-      throw e;
+        const data = await res.json();
+        const text = data?.candidates?.[0]?.content?.parts?.map((p) => p.text || "").join("") || "";
+        if (!text) throw new Error("답을 받지 못했어요. 다시 한 번 눌러주세요.");
+        return json ? parseJsonSafe(text) : text;
+      } catch (e) {
+        if (e.message === "model-not-found") break;
+        throw e;
+      }
     }
   }
-  throw lastErr || new Error("사용할 수 있는 모델을 찾지 못했어요");
+  throw lastErr || new Error("사용할 수 있는 모델을 찾지 못했어요. 잠시 후 다시 해주세요.");
 }
 
-// 모델이 ```json 코드블록으로 감싸는 경우 대비
-function cleanJson(text) {
-  return text.replace(/^```json\s*/i, "").replace(/^```\s*/, "").replace(/```\s*$/, "").trim();
+// 모델이 ```json 코드블록이나 설명 문장으로 감싸는 경우까지 대비해 JSON만 뽑아낸다
+function parseJsonSafe(text) {
+  const stripped = text.replace(/```json/gi, "").replace(/```/g, "").trim();
+  try { return JSON.parse(stripped); } catch (_) { /* 아래에서 재시도 */ }
+  const start = stripped.indexOf("{");
+  const end = stripped.lastIndexOf("}");
+  if (start !== -1 && end > start) {
+    try { return JSON.parse(stripped.slice(start, end + 1)); } catch (_) { /* 아래로 */ }
+  }
+  throw new Error("답을 정리하다 문제가 생겼어요. 한 번만 다시 눌러주세요.");
 }
 
 // ---------- 음성 (TTS / STT) ----------
+// 크롬(안드로이드)은 한 번에 긴 문장을 읽으면 15초쯤에서 뚝 끊긴다.
+// 문장 단위로 잘라 이어 읽게 해서 해결. 읽는 중에 다시 누르면 멈춘다.
 function speak(text) {
   const synth = window.speechSynthesis;
   if (!synth) { toast("이 브라우저는 소리 읽기를 지원하지 않아요"); return; }
-  synth.cancel();
-  const utter = new SpeechSynthesisUtterance(text);
-  utter.lang = "ko-KR";
-  utter.rate = 0.9; // 어르신을 위해 약간 천천히
-  synth.speak(utter);
+  if (synth.speaking || synth.pending) { synth.cancel(); toast("읽기를 멈췄어요"); return; }
+
+  const sentences = text.match(/[^.!?\n]+[.!?\n]?/g) || [text];
+  // 너무 잘게 쪼개지 않도록 140자 안에서 문장을 다시 묶는다
+  const chunks = [];
+  let buf = "";
+  for (const s of sentences) {
+    if ((buf + s).length > 140 && buf) { chunks.push(buf); buf = s; }
+    else buf += s;
+  }
+  if (buf.trim()) chunks.push(buf);
+
+  chunks.forEach((chunk) => {
+    const utter = new SpeechSynthesisUtterance(chunk.trim());
+    utter.lang = "ko-KR";
+    utter.rate = 0.9; // 어르신을 위해 약간 천천히
+    synth.speak(utter);
+  });
 }
 
 function startDictation(inputEl, micBtn) {
@@ -242,6 +278,7 @@ function fillList(id, items, emptyText) {
 $("doc-camera").addEventListener("change", (e) => e.target.files[0] && analyzeDoc(e.target.files[0]));
 $("doc-file").addEventListener("change", (e) => e.target.files[0] && analyzeDoc(e.target.files[0]));
 $("doc-restart").addEventListener("click", () => {
+  window.speechSynthesis.cancel();
   $("doc-result").classList.add("hidden");
   $("doc-start").classList.remove("hidden");
   $("doc-camera").value = "";
@@ -343,8 +380,9 @@ $("phone-ask").addEventListener("click", async () => {
       ol.appendChild(li);
     });
 
-    // "여기를 누르세요" 표시
-    if (shotImg && result.tap && Array.isArray(result.tap.box_2d)) {
+    // "여기를 누르세요" 표시 (좌표가 4개 숫자로 온전할 때만)
+    if (shotImg && result.tap && Array.isArray(result.tap.box_2d) &&
+        result.tap.box_2d.length === 4 && result.tap.box_2d.every((n) => typeof n === "number")) {
       drawTapMarker(shotImg, result.tap);
       $("phone-canvas-wrap").classList.remove("hidden");
     } else {
@@ -373,10 +411,14 @@ function drawTapMarker(img, tap) {
     const ctx = canvas.getContext("2d");
     ctx.drawImage(image, 0, 0);
 
-    const [ymin, xmin, ymax, xmax] = tap.box_2d;
+    const clamp = (n) => Math.min(1000, Math.max(0, n));
+    const [ymin, xmin, ymax, xmax] = tap.box_2d.map(clamp);
     const cx = ((xmin + xmax) / 2 / 1000) * img.width;
     const cy = ((ymin + ymax) / 2 / 1000) * img.height;
-    const r = Math.max(((xmax - xmin) / 1000) * img.width, ((ymax - ymin) / 1000) * img.height) / 2 + 18;
+    const r = Math.min(
+      Math.max(((xmax - xmin) / 1000) * img.width, ((ymax - ymin) / 1000) * img.height) / 2 + 18,
+      img.width * 0.45 // 좌표가 이상하게 커도 원이 화면을 덮지 않게
+    );
 
     // 화면 살짝 어둡게 → 누를 곳만 밝게 강조
     ctx.fillStyle = "rgba(0,0,0,0.35)";
@@ -405,13 +447,15 @@ function drawTapMarker(img, tap) {
       ctx.font = `bold ${fontSize}px sans-serif`;
       const label = `"${tap.label}" 을(를) 누르세요`;
       const tw = ctx.measureText(label).width;
+      const pad = fontSize * 0.5;
+      // 말풍선이 화면 밖으로 나가지 않게 좌우를 고정
+      const lx = Math.min(Math.max(cx, tw / 2 + pad + 4), canvas.width - tw / 2 - pad - 4);
       const ly = Math.max(cy - r - fontSize * 1.2, fontSize * 1.6);
       ctx.fillStyle = "#e53e3e";
-      const pad = fontSize * 0.5;
-      roundRect(ctx, cx - tw / 2 - pad, ly - fontSize * 1.15, tw + pad * 2, fontSize * 1.7, 10);
+      roundRect(ctx, lx - tw / 2 - pad, ly - fontSize * 1.15, tw + pad * 2, fontSize * 1.7, 10);
       ctx.fill();
       ctx.fillStyle = "#fff";
-      ctx.fillText(label, cx, ly);
+      ctx.fillText(label, lx, ly);
     }
   };
   image.src = img.dataUrl;
@@ -428,12 +472,98 @@ function roundRect(ctx, x, y, w, h, r) {
 }
 
 $("phone-restart").addEventListener("click", () => {
+  window.speechSynthesis.cancel();
   $("phone-result").classList.add("hidden");
   $("phone-start").classList.remove("hidden");
   $("phone-question").value = "";
   $("phone-shot").value = "";
   phoneShotFile = null;
   $("phone-shot-name").textContent = "";
+});
+
+// 엔터키로도 질문 제출 (타자에 익숙한 보호자·가족이 도울 때 편리)
+$("doc-question").addEventListener("keydown", (e) => { if (e.key === "Enter") $("doc-ask").click(); });
+$("phone-question").addEventListener("keydown", (e) => { if (e.key === "Enter") $("phone-ask").click(); });
+
+// ============================================================
+// 기능 3: 사기 문자 검사 (보이스피싱·스미싱 판별)
+// ============================================================
+
+const SCAM_PROMPT = (text) => `당신은 할머니 할아버지를 보이스피싱과 스미싱(문자 사기)에서 지켜드리는 손주 AI입니다.
+${text ? `어르신이 받은 문자나 전화 내용: "${text}"` : "첨부된 이미지는 어르신이 받은 문자 화면 캡처입니다."}
+
+정부기관·검찰·경찰 사칭, 가족 사칭("엄마 나 폰 고장났어"), 택배·부고·건강검진 링크,
+대출·환급·지원금 미끼, 앱 설치 유도, 개인정보·계좌·송금 요구 같은 대표 사기 수법인지 판별하세요.
+반드시 아래 JSON 형식으로만, 아주 쉬운 한국어로 답하세요.
+
+{
+  "verdict": "danger(사기가 거의 확실) | warning(사기일 수 있으니 주의) | safe(사기 신호 없음) 중 하나",
+  "title": "결론 한 문장 (예: 가족을 사칭한 사기 문자예요!)",
+  "reasons": ["왜 그렇게 판단했는지 쉬운 말로 2~4개"],
+  "advice": ["어르신이 지금 해야 할 행동을 순서대로 2~4개 (예: 절대 링크를 누르지 마세요)"]
+}`;
+
+const VERDICT_STYLE = {
+  danger: { emoji: "🚨", cls: "danger", fallbackTitle: "사기일 가능성이 매우 높아요!" },
+  warning: { emoji: "⚠️", cls: "warning", fallbackTitle: "사기일 수 있어요. 조심하세요!" },
+  safe: { emoji: "✅", cls: "safe", fallbackTitle: "사기 신호는 보이지 않아요" },
+};
+
+let scamShotFile = null;
+
+$("scam-shot").addEventListener("change", (e) => {
+  scamShotFile = e.target.files[0] || null;
+  $("scam-shot-name").textContent = scamShotFile ? `✅ 캡처 준비 완료: ${scamShotFile.name}` : "";
+});
+
+$("scam-check").addEventListener("click", async () => {
+  const text = $("scam-text").value.trim();
+  if (!text && !scamShotFile) { toast("문자 내용을 붙여넣거나 캡처를 올려주세요"); return; }
+  if (!requireKey()) return;
+
+  try {
+    $("scam-start").classList.add("hidden");
+    $("scam-result").classList.add("hidden");
+    $("scam-loading").classList.remove("hidden");
+
+    const parts = [{ text: SCAM_PROMPT(text) }];
+    if (scamShotFile) {
+      const img = await fileToResizedBase64(scamShotFile);
+      parts.push({ inlineData: { mimeType: "image/jpeg", data: img.base64 } });
+    }
+    const result = await callGemini(parts);
+
+    const style = VERDICT_STYLE[result.verdict] || VERDICT_STYLE.warning;
+    const verdictEl = $("scam-verdict");
+    verdictEl.className = "verdict-card " + style.cls;
+    $("scam-verdict-emoji").textContent = style.emoji;
+    $("scam-verdict-title").textContent = result.title || style.fallbackTitle;
+
+    fillList("scam-reasons", result.reasons, "-");
+    fillList("scam-advice", result.advice, "-");
+
+    const speech = `${result.title || style.fallbackTitle} ` +
+      `이유를 말씀드릴게요. ${(result.reasons || []).join(". ")} ` +
+      `이렇게 하세요. ${(result.advice || []).join(". ")}`;
+    $("scam-tts").onclick = () => speak(speech);
+
+    $("scam-loading").classList.add("hidden");
+    $("scam-result").classList.remove("hidden");
+  } catch (e) {
+    $("scam-loading").classList.add("hidden");
+    $("scam-start").classList.remove("hidden");
+    toast(e.message);
+  }
+});
+
+$("scam-restart").addEventListener("click", () => {
+  window.speechSynthesis.cancel();
+  $("scam-result").classList.add("hidden");
+  $("scam-start").classList.remove("hidden");
+  $("scam-text").value = "";
+  $("scam-shot").value = "";
+  scamShotFile = null;
+  $("scam-shot-name").textContent = "";
 });
 
 // ---------- 첫 실행 안내 ----------
