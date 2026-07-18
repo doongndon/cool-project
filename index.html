@@ -406,7 +406,7 @@
       <!-- 홈 화면 -->
       <div class="fp-screen active" id="fp-home">
         <div class="fp-apps">
-          <button class="fp-app"><span class="fp-app-ic c1"><svg class="ic"><use href="#i-call"/></svg></span>전화</button>
+          <button class="fp-app" id="fp-app-call"><span class="fp-app-ic c1"><svg class="ic"><use href="#i-call"/></svg></span>전화</button>
           <button class="fp-app"><span class="fp-app-ic c2"><svg class="ic"><use href="#i-msg"/></svg></span>메시지</button>
           <button class="fp-app"><span class="fp-app-ic c3"><svg class="ic"><use href="#i-globe"/></svg></span>인터넷</button>
           <button class="fp-app"><span class="fp-app-ic c4"><svg class="ic"><use href="#i-image"/></svg></span>갤러리</button>
@@ -427,10 +427,28 @@
         <button class="fp-row"><svg class="ic"><use href="#i-lock"/></svg><span>보안 및 개인정보</span></button>
       </div>
 
+      <!-- 전화 앱 -->
+      <div class="fp-screen" id="fp-call-list">
+        <div class="fp-header">전화</div>
+        <div class="fp-subtitle">즐겨찾기</div>
+        <button class="fp-row" id="fp-call-daughter"><span class="fp-avatar a1">딸</span><span>사랑하는 딸<small>010-1234-5678</small></span></button>
+        <button class="fp-row"><span class="fp-avatar a2">아</span><span>아들<small>010-8765-4321</small></span></button>
+      </div>
+
+      <!-- 통화 중 화면 -->
+      <div class="fp-screen" id="fp-call-active">
+        <div class="fp-calling">
+          <span class="fp-avatar a1 big">딸</span>
+          <p class="fp-call-name">사랑하는 딸</p>
+          <p class="fp-call-state" id="fp-call-state">통화 중...</p>
+          <button class="fp-hangup" id="fp-call-end" aria-label="전화 끊기"><svg class="ic"><use href="#i-call"/></svg></button>
+        </div>
+      </div>
+
       <!-- 설정 > 디스플레이 -->
       <div class="fp-screen" id="fp-set-display">
         <div class="fp-header">디스플레이</div>
-        <button class="fp-row"><svg class="ic"><use href="#i-sun"/></svg><span>밝기</span></button>
+        <button class="fp-row" id="fp-row-bright"><svg class="ic"><use href="#i-sun"/></svg><span>밝기</span></button>
         <button class="fp-row" id="fp-row-fontsize"><span class="fp-aa">가A</span><span>글자 크기</span></button>
         <button class="fp-row" id="fp-row-timeout"><svg class="ic"><use href="#i-clock"/></svg><span>화면 자동 꺼짐<small id="fp-timeout-state">1분</small></span></button>
       </div>
@@ -443,6 +461,17 @@
           <button class="fp-size" id="fp-size-small">작게</button>
           <button class="fp-size on" id="fp-size-mid">보통</button>
           <button class="fp-size" id="fp-size-large">크게</button>
+        </div>
+      </div>
+
+      <!-- 설정 > 밝기 -->
+      <div class="fp-screen" id="fp-set-bright">
+        <div class="fp-header">밝기</div>
+        <div class="fp-sample" id="fp-bright-sample">화면 밝기 미리보기</div>
+        <div class="fp-sizes">
+          <button class="fp-size" id="fp-bright-low">어둡게</button>
+          <button class="fp-size on" id="fp-bright-mid">보통</button>
+          <button class="fp-size" id="fp-bright-high">밝게</button>
         </div>
       </div>
 
