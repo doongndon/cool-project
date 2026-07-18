@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#2b6cb0">
+<title>AI 손주 - 어르신 디지털 도우미</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧑‍🦳</text></svg>">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ===== 홈 화면 ===== -->
+<section id="screen-home" class="screen active">
+  <header class="home-header">
+    <h1>🧑‍🦳 AI 손주</h1>
+    <p class="subtitle">손주처럼 친절하게 알려드려요</p>
+    <button id="btn-settings" class="icon-btn" aria-label="설정">⚙️</button>
+  </header>
+
+  <div class="menu-cards">
+    <button class="menu-card" data-go="doc">
+      <span class="card-emoji">📄</span>
+      <span class="card-title">어려운 서류 풀이</span>
+      <span class="card-desc">계약서, 고지서, 안내문을<br>사진 찍으면 쉽게 설명해요</span>
+    </button>
+
+    <button class="menu-card" data-go="phone">
+      <span class="card-emoji">📱</span>
+      <span class="card-title">폰 사용법 알려줘</span>
+      <span class="card-desc">화면을 보여주시면<br>"여기를 누르세요" 알려드려요</span>
+    </button>
+  </div>
+
+  <div class="font-size-row">
+    <span>글자 크기</span>
+    <button class="font-btn" data-scale="1">보통</button>
+    <button class="font-btn active" data-scale="1.15">크게</button>
+    <button class="font-btn" data-scale="1.35">아주 크게</button>
+  </div>
+</section>
+
+<!-- ===== 서류 풀이 화면 ===== -->
+<section id="screen-doc" class="screen">
+  <header class="screen-header">
+    <button class="back-btn" data-go="home">← 처음으로</button>
+    <h2>📄 어려운 서류 풀이</h2>
+  </header>
+
+  <div id="doc-start" class="panel">
+    <p class="guide-text">계약서나 고지서를<br><b>사진으로 찍어주세요</b></p>
+    <label class="big-btn primary" for="doc-camera">📷 사진 찍기</label>
+    <input type="file" id="doc-camera" accept="image/*" capture="environment" hidden>
+    <label class="big-btn" for="doc-file">🖼️ 앨범에서 고르기</label>
+    <input type="file" id="doc-file" accept="image/*" hidden>
+  </div>
+
+  <div id="doc-loading" class="panel hidden">
+    <div class="spinner"></div>
+    <p class="guide-text">서류를 꼼꼼히 읽고 있어요...<br>잠시만 기다려주세요</p>
+  </div>
+
+  <div id="doc-result" class="panel hidden">
+    <img id="doc-preview" class="doc-preview" alt="찍은 서류 사진">
+    <button id="doc-tts" class="big-btn speak">🔊 소리로 들려줘</button>
+
+    <div class="result-card">
+      <h3>📌 이 서류는요</h3>
+      <p id="doc-type"></p>
+    </div>
+    <div class="result-card">
+      <h3>💬 쉬운 말 요약</h3>
+      <p id="doc-summary"></p>
+    </div>
+    <div class="result-card important">
+      <h3>⚠️ 조심하세요!</h3>
+      <ul id="doc-warnings"></ul>
+    </div>
+    <div class="result-card">
+      <h3>✅ 꼭 알아두세요</h3>
+      <ul id="doc-mustknow"></ul>
+    </div>
+    <div class="result-card">
+      <h3>📖 어려운 말 풀이</h3>
+      <dl id="doc-words"></dl>
+    </div>
+
+    <div class="followup">
+      <p class="guide-text">더 궁금한 게 있으세요?</p>
+      <div class="ask-row">
+        <input type="text" id="doc-question" placeholder="예: 위약금이 얼마예요?">
+        <button id="doc-mic" class="mic-btn" aria-label="음성으로 질문">🎤</button>
+      </div>
+      <button id="doc-ask" class="big-btn primary">질문하기</button>
+      <div id="doc-answer" class="result-card hidden">
+        <h3>👧 AI 손주의 대답</h3>
+        <p id="doc-answer-text"></p>
+        <button id="doc-answer-tts" class="big-btn speak">🔊 소리로 들려줘</button>
+      </div>
+    </div>
+
+    <button class="big-btn" id="doc-restart">📷 다른 서류 찍기</button>
+  </div>
+</section>
+
+<!-- ===== 폰 사용법 화면 ===== -->
+<section id="screen-phone" class="screen">
+  <header class="screen-header">
+    <button class="back-btn" data-go="home">← 처음으로</button>
+    <h2>📱 폰 사용법 알려줘</h2>
+  </header>
+
+  <div id="phone-start" class="panel">
+    <p class="guide-text">무엇이 어려우세요?<br>말로 하셔도 돼요</p>
+    <div class="ask-row">
+      <input type="text" id="phone-question" placeholder="예: 카카오톡으로 사진 보내는 법">
+      <button id="phone-mic" class="mic-btn" aria-label="음성으로 질문">🎤</button>
+    </div>
+
+    <p class="guide-text small">지금 보고 있는 화면을 캡처해서 올려주시면<br><b>"여기를 누르세요"</b> 하고 짚어드려요 (선택)</p>
+    <label class="big-btn" for="phone-shot">🖼️ 화면 캡처 올리기</label>
+    <input type="file" id="phone-shot" accept="image/*" hidden>
+    <p id="phone-shot-name" class="file-name"></p>
+
+    <button id="phone-ask" class="big-btn primary">알려줘!</button>
+
+    <div class="example-box">
+      <p>이렇게 물어보세요</p>
+      <button class="example-chip">글자를 크게 하고 싶어요</button>
+      <button class="example-chip">카카오톡으로 사진 보내는 법</button>
+      <button class="example-chip">스팸 전화를 차단하고 싶어요</button>
+      <button class="example-chip">와이파이 연결하는 법</button>
+    </div>
+  </div>
+
+  <div id="phone-loading" class="panel hidden">
+    <div class="spinner"></div>
+    <p class="guide-text">화면을 살펴보고 있어요...<br>잠시만 기다려주세요</p>
+  </div>
+
+  <div id="phone-result" class="panel hidden">
+    <button id="phone-tts" class="big-btn speak">🔊 소리로 들려줘</button>
+
+    <div class="result-card">
+      <h3>👧 AI 손주의 대답</h3>
+      <p id="phone-answer"></p>
+    </div>
+
+    <div id="phone-canvas-wrap" class="canvas-wrap hidden">
+      <h3 class="canvas-title">👇 여기를 누르세요!</h3>
+      <canvas id="phone-canvas"></canvas>
+    </div>
+
+    <div class="result-card">
+      <h3>📋 순서대로 따라하세요</h3>
+      <ol id="phone-steps" class="step-list"></ol>
+    </div>
+
+    <button class="big-btn" id="phone-restart">🙋 다른 것 물어보기</button>
+  </div>
+</section>
+
+<!-- ===== 설정 모달 ===== -->
+<div id="settings-modal" class="modal hidden">
+  <div class="modal-box">
+    <h2>⚙️ 처음 한 번만 설정</h2>
+    <p class="guide-text small">
+      무료 Gemini 열쇠(API 키)가 필요해요.<br>
+      <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">👉 여기서 무료로 발급받기</a><br>
+      (구글 계정으로 로그인 → "API 키 만들기" 누르기)
+    </p>
+    <input type="password" id="api-key-input" placeholder="발급받은 키를 여기에 붙여넣기">
+    <button id="save-key" class="big-btn primary">저장하기</button>
+    <button id="close-settings" class="big-btn">닫기</button>
+    <p class="guide-text small">키는 이 폰에만 저장되고 다른 곳으로 보내지 않아요.</p>
+  </div>
+</div>
+
+<!-- ===== 알림 토스트 ===== -->
+<div id="toast" class="toast hidden"></div>
+
+<script src="js/app.js"></script>
+</body>
+</html>
