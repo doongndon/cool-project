@@ -29,6 +29,16 @@
   <symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
   </symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+  </symbol>
+  <symbol id="i-share" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+  </symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+  </symbol>
   <symbol id="i-speaker" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>
   </symbol>
@@ -94,7 +104,7 @@
     <button class="menu-card" data-go="doc">
       <span class="card-ic blue"><svg class="ic"><use href="#i-doc"/></svg></span>
       <span class="card-body">
-        <span class="card-title">어려운 서류 풀이</span>
+        <span class="card-title">서류 해석</span>
         <span class="card-desc">계약서, 고지서를 사진 찍으면 쉽게 설명해요</span>
       </span>
       <svg class="ic card-chevron"><use href="#i-chevron"/></svg>
@@ -103,8 +113,8 @@
     <button class="menu-card" data-go="phone">
       <span class="card-ic green"><svg class="ic"><use href="#i-phone"/></svg></span>
       <span class="card-body">
-        <span class="card-title">폰 사용법 알려줘</span>
-        <span class="card-desc">화면을 보여주시면 "여기를 누르세요" 알려드려요</span>
+        <span class="card-title">폰 사용법</span>
+        <span class="card-desc">화면을 보여주시면 "여기를 누르세요" 짚어드려요</span>
       </span>
       <svg class="ic card-chevron"><use href="#i-chevron"/></svg>
     </button>
@@ -112,8 +122,17 @@
     <button class="menu-card" data-go="scam">
       <span class="card-ic red"><svg class="ic"><use href="#i-shield"/></svg></span>
       <span class="card-body">
-        <span class="card-title">사기 아닐까?</span>
+        <span class="card-title">사기 검사</span>
         <span class="card-desc">수상한 문자, 전화 내용을 검사해드려요</span>
+      </span>
+      <svg class="ic card-chevron"><use href="#i-chevron"/></svg>
+    </button>
+
+    <button class="menu-card" data-go="history">
+      <span class="card-ic gray"><svg class="ic"><use href="#i-clock"/></svg></span>
+      <span class="card-body">
+        <span class="card-title">지난 기록</span>
+        <span class="card-desc">전에 물어본 내용을 다시 볼 수 있어요</span>
       </span>
       <svg class="ic card-chevron"><use href="#i-chevron"/></svg>
     </button>
@@ -129,11 +148,11 @@
   </div>
 </section>
 
-<!-- ===== 서류 풀이 화면 ===== -->
+<!-- ===== 서류 해석 화면 ===== -->
 <section id="screen-doc" class="screen">
   <header class="screen-header">
     <button class="back-btn" data-go="home" aria-label="처음으로"><svg class="ic"><use href="#i-back"/></svg></button>
-    <h2>어려운 서류 풀이</h2>
+    <h2>서류 해석</h2>
   </header>
 
   <div id="doc-start" class="panel">
@@ -151,26 +170,29 @@
 
   <div id="doc-result" class="panel hidden">
     <img id="doc-preview" class="doc-preview" alt="찍은 서류 사진">
-    <button id="doc-tts" class="big-btn speak"><svg class="ic"><use href="#i-speaker"/></svg> 소리로 들려줘</button>
+    <div class="btn-row">
+      <button id="doc-tts" class="big-btn speak"><svg class="ic"><use href="#i-speaker"/></svg> 소리로 듣기</button>
+      <button id="doc-share" class="big-btn"><svg class="ic"><use href="#i-share"/></svg> 가족에게 공유</button>
+    </div>
 
     <div class="result-card">
-      <h3>이 서류는요</h3>
+      <h3>서류 종류</h3>
       <p id="doc-type"></p>
     </div>
     <div class="result-card">
-      <h3>쉬운 말 요약</h3>
+      <h3>쉬운 요약</h3>
       <p id="doc-summary"></p>
     </div>
     <div class="result-card important">
-      <h3><svg class="ic"><use href="#i-warn"/></svg> 조심하세요!</h3>
+      <h3><svg class="ic"><use href="#i-warn"/></svg> 주의사항</h3>
       <ul id="doc-warnings"></ul>
     </div>
     <div class="result-card">
-      <h3><svg class="ic"><use href="#i-check"/></svg> 꼭 알아두세요</h3>
+      <h3><svg class="ic"><use href="#i-check"/></svg> 핵심 정보</h3>
       <ul id="doc-mustknow"></ul>
     </div>
     <div class="result-card">
-      <h3>어려운 말 풀이</h3>
+      <h3>용어 풀이</h3>
       <dl id="doc-words"></dl>
     </div>
 
@@ -182,13 +204,13 @@
       </div>
       <button id="doc-ask" class="big-btn primary">질문하기</button>
       <div id="doc-answer" class="result-card hidden">
-        <h3><svg class="ic"><use href="#i-help"/></svg> AI 손주의 대답</h3>
+        <h3><svg class="ic"><use href="#i-help"/></svg> AI 답변</h3>
         <p id="doc-answer-text"></p>
-        <button id="doc-answer-tts" class="big-btn speak"><svg class="ic"><use href="#i-speaker"/></svg> 소리로 들려줘</button>
+        <button id="doc-answer-tts" class="big-btn speak"><svg class="ic"><use href="#i-speaker"/></svg> 소리로 듣기</button>
       </div>
     </div>
 
-    <button class="big-btn" id="doc-restart"><svg class="ic"><use href="#i-redo"/></svg> 다른 서류 찍기</button>
+    <button class="big-btn" id="doc-restart"><svg class="ic"><use href="#i-redo"/></svg> 다시 찍기</button>
   </div>
 </section>
 
@@ -196,7 +218,7 @@
 <section id="screen-phone" class="screen">
   <header class="screen-header">
     <button class="back-btn" data-go="home" aria-label="처음으로"><svg class="ic"><use href="#i-back"/></svg></button>
-    <h2>폰 사용법 알려줘</h2>
+    <h2>폰 사용법</h2>
   </header>
 
   <div id="phone-start" class="panel">
@@ -207,11 +229,11 @@
     </div>
 
     <p class="guide-text small">지금 보고 있는 화면을 캡처해서 올려주시면<br><b>"여기를 누르세요"</b> 하고 짚어드려요 (선택)</p>
-    <label class="big-btn" for="phone-shot"><svg class="ic"><use href="#i-image"/></svg> 화면 캡처 올리기</label>
+    <label class="big-btn" for="phone-shot"><svg class="ic"><use href="#i-image"/></svg> 캡처 올리기</label>
     <input type="file" id="phone-shot" accept="image/*" hidden>
     <p id="phone-shot-name" class="file-name"></p>
 
-    <button id="phone-ask" class="big-btn primary">알려줘!</button>
+    <button id="phone-ask" class="big-btn primary">물어보기</button>
 
     <div class="example-box">
       <p>이렇게 물어보세요</p>
@@ -228,10 +250,13 @@
   </div>
 
   <div id="phone-result" class="panel hidden">
-    <button id="phone-tts" class="big-btn speak"><svg class="ic"><use href="#i-speaker"/></svg> 소리로 들려줘</button>
+    <div class="btn-row">
+      <button id="phone-tts" class="big-btn speak"><svg class="ic"><use href="#i-speaker"/></svg> 소리로 듣기</button>
+      <button id="phone-share" class="big-btn"><svg class="ic"><use href="#i-share"/></svg> 가족에게 공유</button>
+    </div>
 
     <div class="result-card">
-      <h3><svg class="ic"><use href="#i-help"/></svg> AI 손주의 대답</h3>
+      <h3><svg class="ic"><use href="#i-help"/></svg> AI 답변</h3>
       <p id="phone-answer"></p>
     </div>
 
@@ -241,11 +266,11 @@
     </div>
 
     <div class="result-card">
-      <h3>순서대로 따라하세요</h3>
+      <h3>따라하기</h3>
       <ol id="phone-steps" class="step-list"></ol>
     </div>
 
-    <button class="big-btn" id="phone-restart"><svg class="ic"><use href="#i-redo"/></svg> 다른 것 물어보기</button>
+    <button class="big-btn" id="phone-restart"><svg class="ic"><use href="#i-redo"/></svg> 새 질문</button>
   </div>
 </section>
 
@@ -253,16 +278,16 @@
 <section id="screen-scam" class="screen">
   <header class="screen-header">
     <button class="back-btn" data-go="home" aria-label="처음으로"><svg class="ic"><use href="#i-back"/></svg></button>
-    <h2>사기 아닐까?</h2>
+    <h2>사기 검사</h2>
   </header>
 
   <div id="scam-start" class="panel">
     <p class="guide-text">수상한 <b>문자 내용을 붙여넣거나</b><br>문자 화면을 <b>캡처해서 올려주세요</b></p>
     <textarea id="scam-text" rows="4" placeholder="예: [Web발신] 아들이에요. 폰이 고장나서 그러는데 이 링크로..."></textarea>
-    <label class="big-btn" for="scam-shot"><svg class="ic"><use href="#i-image"/></svg> 문자 화면 캡처 올리기</label>
+    <label class="big-btn" for="scam-shot"><svg class="ic"><use href="#i-image"/></svg> 캡처 올리기</label>
     <input type="file" id="scam-shot" accept="image/*" hidden>
     <p id="scam-shot-name" class="file-name"></p>
-    <button id="scam-check" class="big-btn primary"><svg class="ic"><use href="#i-search"/></svg> 사기인지 검사하기</button>
+    <button id="scam-check" class="big-btn primary"><svg class="ic"><use href="#i-search"/></svg> 검사하기</button>
     <p class="guide-text small">전화로 들은 이야기도 적어서 검사할 수 있어요.<br>예: "검찰청이라며 계좌가 범죄에 연루됐다고 해요"</p>
   </div>
 
@@ -276,18 +301,21 @@
       <svg class="ic verdict-ic"><use id="scam-verdict-use" href="#i-warn"/></svg>
       <span id="scam-verdict-title" class="verdict-title"></span>
     </div>
-    <button id="scam-tts" class="big-btn speak"><svg class="ic"><use href="#i-speaker"/></svg> 소리로 들려줘</button>
+    <div class="btn-row">
+      <button id="scam-tts" class="big-btn speak"><svg class="ic"><use href="#i-speaker"/></svg> 소리로 듣기</button>
+      <button id="scam-share" class="big-btn"><svg class="ic"><use href="#i-share"/></svg> 가족에게 공유</button>
+    </div>
 
     <div class="result-card">
-      <h3><svg class="ic"><use href="#i-search"/></svg> 왜 그런가요?</h3>
+      <h3><svg class="ic"><use href="#i-search"/></svg> 판단 근거</h3>
       <ul id="scam-reasons"></ul>
     </div>
     <div class="result-card important">
-      <h3><svg class="ic"><use href="#i-warn"/></svg> 이렇게 하세요</h3>
+      <h3><svg class="ic"><use href="#i-warn"/></svg> 행동 요령</h3>
       <ul id="scam-advice"></ul>
     </div>
     <div class="result-card">
-      <h3><svg class="ic"><use href="#i-call"/></svg> 도움 받을 곳</h3>
+      <h3><svg class="ic"><use href="#i-call"/></svg> 신고 전화</h3>
       <ul>
         <li>경찰 <a href="tel:112"><b>112</b></a> — 사기 신고</li>
         <li>금융감독원 <a href="tel:1332"><b>1332</b></a> — 돈을 보냈다면 즉시!</li>
@@ -295,20 +323,43 @@
       </ul>
     </div>
 
-    <button class="big-btn" id="scam-restart"><svg class="ic"><use href="#i-redo"/></svg> 다른 문자 검사하기</button>
+    <button class="big-btn" id="scam-restart"><svg class="ic"><use href="#i-redo"/></svg> 새 검사</button>
+  </div>
+</section>
+
+<!-- ===== 지난 기록 화면 ===== -->
+<section id="screen-history" class="screen">
+  <header class="screen-header">
+    <button class="back-btn" data-go="home" aria-label="처음으로"><svg class="ic"><use href="#i-back"/></svg></button>
+    <h2>지난 기록</h2>
+    <button id="history-clear" class="icon-btn push-right" aria-label="기록 전체 삭제"><svg class="ic"><use href="#i-trash"/></svg></button>
+  </header>
+
+  <div class="panel">
+    <p id="history-empty" class="guide-text small hidden">아직 기록이 없어요.<br>서류 해석이나 사기 검사를 하면 여기에 저장돼요.</p>
+    <div id="history-list" class="history-list"></div>
   </div>
 </section>
 
 <!-- ===== 설정 모달 ===== -->
 <div id="settings-modal" class="modal hidden">
   <div class="modal-box">
-    <h2>처음 한 번만 설정</h2>
+    <h2>설정</h2>
     <p class="guide-text small">
-      무료 Gemini 열쇠(API 키)가 필요해요.<br>
-      <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">여기서 무료로 발급받기</a><br>
-      (구글 계정으로 로그인 → "API 키 만들기" 누르기)
+      무료 Gemini 열쇠(API 키)가 필요해요.
+      <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">여기서 무료로 발급받기</a>
+      (구글 계정으로 로그인 → "API 키 만들기")
     </p>
     <input type="password" id="api-key-input" placeholder="발급받은 키를 여기에 붙여넣기">
+
+    <div class="setting-row">
+      <span class="font-label">읽어주는 속도</span>
+      <div class="segmented">
+        <button class="speed-btn" data-rate="0.75">천천히</button>
+        <button class="speed-btn active" data-rate="0.95">보통</button>
+      </div>
+    </div>
+
     <button id="save-key" class="big-btn primary">저장하기</button>
     <button id="close-settings" class="big-btn">닫기</button>
     <p class="guide-text small">키는 이 폰에만 저장되고 다른 곳으로 보내지 않아요.</p>

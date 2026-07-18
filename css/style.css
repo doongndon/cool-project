@@ -95,6 +95,7 @@ button { font-family: inherit; color: inherit; }
 .card-ic.blue  { background: var(--accent-soft); color: var(--accent); }
 .card-ic.green { background: var(--green-soft);  color: var(--green-text); }
 .card-ic.red   { background: var(--red-soft);    color: var(--red-text); }
+.card-ic.gray  { background: var(--fill);        color: var(--text-sub); }
 .card-body { display: flex; flex-direction: column; gap: 0.15rem; flex: 1; }
 .card-title { font-size: 1.2rem; font-weight: 800; letter-spacing: -0.02em; }
 .card-desc { font-size: 0.92rem; color: var(--text-sub); line-height: 1.45; }
@@ -165,6 +166,45 @@ button { font-family: inherit; color: inherit; }
 .big-btn.primary { background: var(--accent); color: #fff; }
 .big-btn.primary:active { background: var(--accent-press); }
 .big-btn.speak { background: var(--green-soft); color: var(--green-text); }
+
+/* 결과 상단 버튼 2열 */
+.btn-row { display: flex; gap: 0.6rem; }
+.btn-row .big-btn { flex: 1; font-size: 0.95rem; padding: 0.85rem 0.4rem; gap: 0.35rem; white-space: nowrap; }
+.btn-row .big-btn:not(.speak) { background: var(--card); box-shadow: var(--shadow); color: var(--text-sub); }
+
+/* ===== 지난 기록 ===== */
+.push-right { margin-left: auto; }
+.history-list { display: flex; flex-direction: column; gap: 0.7rem; }
+.history-item {
+  display: flex; align-items: center; gap: 0.9rem;
+  background: var(--card); border: none; border-radius: 18px;
+  padding: 0.95rem 1rem; text-align: left; cursor: pointer;
+  box-shadow: var(--shadow);
+}
+.history-item:active { transform: scale(0.98); background: #fafbfc; }
+.history-item .card-ic { width: 2.7rem; height: 2.7rem; min-width: 2.7rem; border-radius: 13px; }
+.history-item .card-ic .ic { width: 1.35rem; height: 1.35rem; }
+.hist-title {
+  font-size: 1.02rem; font-weight: 700;
+  display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden;
+}
+.hist-date { font-size: 0.83rem; color: var(--text-faint); }
+
+/* 설정 행 */
+.setting-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.2rem 0;
+}
+.speed-btn {
+  font-size: 0.95rem; font-weight: 600;
+  padding: 0.5rem 1rem;
+  border: none; border-radius: 11px;
+  background: transparent; color: var(--text-sub); cursor: pointer;
+}
+.speed-btn.active {
+  background: var(--card); color: var(--text); font-weight: 800;
+  box-shadow: 0 1px 4px rgba(25, 31, 40, 0.12);
+}
 
 /* ===== 로딩 ===== */
 .spinner {
