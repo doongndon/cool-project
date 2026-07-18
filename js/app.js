@@ -88,8 +88,11 @@ function toast(msg, ms = 3500) {
 
 // ---------- API 키 ----------
 function getKey() {
-  // 저장된 키가 없으면 config.js(로컬 전용, git 제외)의 기본 키를 사용
-  return localStorage.getItem(KEY_STORAGE) || window.AI_SONJU_DEFAULT_KEY || "";
+  // 배포본에 내장된 기본 키가 있으면 그것을 최우선으로 쓴다
+  // (예시 파일의 안내 문구나 잘못된 키는 형식 검사로 걸러낸다)
+  const embedded = window.AI_SONJU_DEFAULT_KEY;
+  if (embedded && /^AIza[0-9A-Za-z_-]{30,}$/.test(embedded)) return embedded;
+  return localStorage.getItem(KEY_STORAGE) || "";
 }
 function openSettings() {
   $("api-key-input").value = getKey();
