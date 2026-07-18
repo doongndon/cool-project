@@ -945,6 +945,17 @@ $("scam-restart").addEventListener("click", () => {
   $("scam-shot-name").textContent = "";
 });
 
+// ---------- 시간대별 인사말 ----------
+(function setGreeting() {
+  const h = new Date().getHours();
+  let hello;
+  if (h >= 5 && h < 11) hello = "좋은 아침이에요!";
+  else if (h >= 11 && h < 17) hello = "안녕하세요!";
+  else if (h >= 17 && h < 21) hello = "편안한 저녁이에요!";
+  else hello = "늦은 시간이네요!";
+  document.querySelector(".greeting").innerHTML = `${hello}<br>무엇을 도와드릴까요?`;
+})();
+
 // ---------- 오늘의 폰 꿀팁 (AI가 매일 하나씩) ----------
 const TIP_STORAGE = "ai_sonju_daily_tip";
 
