@@ -360,7 +360,7 @@ const DOC_PROMPT = `당신은 할머니 할아버지를 돕는 다정한 손주 
   "words": [{"word": "서류에 나온 어려운 단어", "meaning": "쉬운 뜻풀이"}]
 }`;
 
-let docImageBase64 = null;
+let docImagesBase64 = []; // 여러 장짜리 서류 지원 (추가 질문에도 함께 보낸다)
 
 function fillList(id, items, emptyText) {
   const ul = $(id);
@@ -409,24 +409,32 @@ function renderDocResult(data, previewUrl) {
   $("doc-share").onclick = () => shareText(docShareText(data));
 }
 
-async function analyzeDoc(file) {
+async function analyzeDoc(files) {
   if (!requireKey()) return;
   try {
+    if (files.length > 3) toast("사진은 3장까지만 볼 수 있어요. 앞의 3장을 사용할게요.");
+    const picked = files.slice(0, 3);
+
     $("doc-start").classList.add("hidden");
     $("doc-result").classList.add("hidden");
     $("doc-loading").classList.remove("hidden");
 
-    const img = await fileToResizedBase64(file);
-    docImageBase64 = img.base64;
+    const imgs = [];
+    for (const f of picked) imgs.push(await fileToResizedBase64(f));
+    docImagesBase64 = imgs.map((i) => i.base64);
+
+    const prompt = imgs.length > 1
+      ? `${DOC_PROMPT}\n\n(사진 ${imgs.length}장은 같은 서류의 여러 페이지입니다. 전체를 하나의 서류로 보고 정리하세요.)`
+      : DOC_PROMPT;
 
     const result = await callGemini([
-      { text: DOC_PROMPT },
-      { inlineData: { mimeType: "image/jpeg", data: img.base64 } },
+      { text: prompt },
+      ...imgs.map((i) => ({ inlineData: { mimeType: "image/jpeg", data: i.base64 } })),
     ]);
 
-    renderDocResult(result, img.dataUrl);
+    renderDocResult(result, imgs[0].dataUrl);
 
-    const thumb = await shrinkDataUrl(img.dataUrl);
+    const thumb = await shrinkDataUrl(imgs[0].dataUrl);
     saveHistoryEntry({ type: "doc", ts: Date.now(), title: result.doc_type, data: result, img: thumb });
   } catch (e) {
     $("doc-loading").classList.add("hidden");
@@ -435,8 +443,8 @@ async function analyzeDoc(file) {
   }
 }
 
-$("doc-camera").addEventListener("change", (e) => e.target.files[0] && analyzeDoc(e.target.files[0]));
-$("doc-file").addEventListener("change", (e) => e.target.files[0] && analyzeDoc(e.target.files[0]));
+$("doc-camera").addEventListener("change", (e) => e.target.files[0] && analyzeDoc([...e.target.files]));
+$("doc-file").addEventListener("change", (e) => e.target.files[0] && analyzeDoc([...e.target.files]));
 $("doc-restart").addEventListener("click", () => {
   window.speechSynthesis.cancel();
   $("doc-result").classList.add("hidden");
@@ -451,17 +459,17 @@ $("doc-ask").addEventListener("click", async () => {
   const q = $("doc-question").value.trim();
   if (!q) { toast("궁금한 것을 말하거나 적어주세요"); return; }
   if (!requireKey()) return;
-  if (!docImageBase64) {
+  if (!docImagesBase64.length) {
     // 기록에서 열었을 때는 화면의 썸네일로 다시 질문한다
     const src = $("doc-preview").src;
-    if (src.startsWith("data:")) docImageBase64 = src.split(",")[1];
+    if (src.startsWith("data:")) docImagesBase64 = [src.split(",")[1]];
     else { toast("사진이 없어서 질문할 수 없어요. 서류를 다시 찍어주세요."); return; }
   }
   try {
     $("doc-ask").textContent = "생각하는 중...";
     const answer = await callGemini([
       { text: `사진 속 문서를 보고 어르신의 질문에 다정하고 아주 쉬운 한국어 2~3문장으로 답하세요. 질문: ${q}` },
-      { inlineData: { mimeType: "image/jpeg", data: docImageBase64 } },
+      ...docImagesBase64.map((b) => ({ inlineData: { mimeType: "image/jpeg", data: b } })),
     ], { json: false });
     $("doc-answer-text").textContent = answer;
     $("doc-answer").classList.remove("hidden");
@@ -932,6 +940,11 @@ $("tip-refresh").addEventListener("click", () => {
 });
 
 loadDailyTip();
+
+// ---------- 오프라인 지원 (서비스 워커) ----------
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("sw.js").catch(() => { /* 미지원/실패해도 앱은 정상 동작 */ });
+}
 
 // ---------- 첫 실행 안내 ----------
 if (!getKey()) {
