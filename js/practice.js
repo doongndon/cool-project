@@ -254,6 +254,12 @@ ${feedback ? `\n(이전 설계의 문제: ${feedback} — 반드시 고쳐서 �
     try {
       $("practice-select").classList.add("hidden");
       $("practice-loading").classList.remove("hidden");
+      startLoadingMsgs("practice-loading", [
+        "AI가 연습 순서를 짜고 있어요...",
+        "가상 폰 구석구석을 살펴보고 있어요...",
+        "쉬운 안내 문장을 만들고 있어요...",
+        "거의 다 됐어요, 잠시만요...",
+      ]);
       const aiPlan = await buildAiPlan(q);
       lastRequest = q;
       // AI가 만든 연습을 기록에 저장 — 다음엔 API 호출 없이 다시 연습 가능
@@ -263,6 +269,8 @@ ${feedback ? `\n(이전 설계의 문제: ${feedback} — 반드시 고쳐서 �
       $("practice-loading").classList.add("hidden");
       $("practice-select").classList.remove("hidden");
       toast(e.message, 5000);
+    } finally {
+      stopLoadingMsgs();
     }
   });
 

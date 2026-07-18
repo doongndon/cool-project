@@ -57,6 +57,25 @@ document.querySelectorAll(".speed-btn").forEach((btn) => {
 });
 applySpeed(localStorage.getItem(SPEED_STORAGE) || "0.95");
 
+// ---------- 로딩 문구 순환 ----------
+// AI가 생각하는 동안 문구가 바뀌어서 "멈춘 게 아니에요"를 보여준다
+let loadingTimer = null;
+function startLoadingMsgs(panelId, msgs) {
+  const el = document.querySelector(`#${panelId} .guide-text`);
+  if (!el) return;
+  let i = 0;
+  el.textContent = msgs[0];
+  clearInterval(loadingTimer);
+  loadingTimer = setInterval(() => {
+    i = (i + 1) % msgs.length;
+    el.textContent = msgs[i];
+  }, 2500);
+}
+function stopLoadingMsgs() {
+  clearInterval(loadingTimer);
+  loadingTimer = null;
+}
+
 // ---------- 토스트 ----------
 let toastTimer = null;
 function toast(msg, ms = 3500) {
@@ -418,6 +437,12 @@ async function analyzeDoc(files) {
     $("doc-start").classList.add("hidden");
     $("doc-result").classList.add("hidden");
     $("doc-loading").classList.remove("hidden");
+    startLoadingMsgs("doc-loading", [
+      "서류를 꼼꼼히 읽고 있어요...",
+      "어려운 말을 쉬운 말로 바꾸고 있어요...",
+      "조심할 부분이 있는지 찾고 있어요...",
+      "거의 다 됐어요, 잠시만요...",
+    ]);
 
     const imgs = [];
     for (const f of picked) imgs.push(await fileToResizedBase64(f));
@@ -440,6 +465,8 @@ async function analyzeDoc(files) {
     $("doc-loading").classList.add("hidden");
     $("doc-start").classList.remove("hidden");
     toast(e.message);
+  } finally {
+    stopLoadingMsgs();
   }
 }
 
@@ -569,6 +596,12 @@ $("phone-ask").addEventListener("click", async () => {
     $("phone-start").classList.add("hidden");
     $("phone-result").classList.add("hidden");
     $("phone-loading").classList.remove("hidden");
+    startLoadingMsgs("phone-loading", [
+      "화면을 살펴보고 있어요...",
+      "어디를 눌러야 할지 찾고 있어요...",
+      "쉬운 순서로 정리하고 있어요...",
+      "거의 다 됐어요, 잠시만요...",
+    ]);
 
     let result, shotImg = null;
     if (phoneShotFile) {
@@ -589,6 +622,8 @@ $("phone-ask").addEventListener("click", async () => {
     $("phone-loading").classList.add("hidden");
     $("phone-start").classList.remove("hidden");
     toast(e.message);
+  } finally {
+    stopLoadingMsgs();
   }
 });
 $("phone-question").addEventListener("keydown", (e) => { if (e.key === "Enter") $("phone-ask").click(); });
@@ -876,6 +911,11 @@ $("scam-check").addEventListener("click", async () => {
     $("scam-start").classList.add("hidden");
     $("scam-result").classList.add("hidden");
     $("scam-loading").classList.remove("hidden");
+    startLoadingMsgs("scam-loading", [
+      "사기 수법인지 꼼꼼히 살펴보고 있어요...",
+      "잘 알려진 사기 수법과 비교하고 있어요...",
+      "거의 다 됐어요, 잠시만요...",
+    ]);
 
     const parts = [{ text: SCAM_PROMPT(text) }];
     if (scamShotFile) {
@@ -890,6 +930,8 @@ $("scam-check").addEventListener("click", async () => {
     $("scam-loading").classList.add("hidden");
     $("scam-start").classList.remove("hidden");
     toast(e.message);
+  } finally {
+    stopLoadingMsgs();
   }
 });
 
