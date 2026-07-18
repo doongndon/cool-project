@@ -150,6 +150,7 @@ ${feedback ? `\n(이전 설계의 문제: ${feedback} — 반드시 고쳐서 �
   let stepIdx = 0;
   let running = false;
   let missToastAt = 0;
+  let lastRequest = ""; // 마지막 부탁 문장 (실전 연결용)
 
   function switchFp(screenId) {
     document.querySelectorAll(".fp-screen").forEach((s) => s.classList.remove("active"));
@@ -254,6 +255,9 @@ ${feedback ? `\n(이전 설계의 문제: ${feedback} — 반드시 고쳐서 �
       $("practice-select").classList.add("hidden");
       $("practice-loading").classList.remove("hidden");
       const aiPlan = await buildAiPlan(q);
+      lastRequest = q;
+      // AI가 만든 연습을 기록에 저장 — 다음엔 API 호출 없이 다시 연습 가능
+      saveHistoryEntry({ type: "practice", ts: Date.now(), title: aiPlan.title || q, data: aiPlan });
       runPlan(aiPlan);
     } catch (e) {
       $("practice-loading").classList.add("hidden");
@@ -274,4 +278,21 @@ ${feedback ? `\n(이전 설계의 문제: ${feedback} — 반드시 고쳐서 �
   $("practice-exit").addEventListener("click", exitToSelect);
   $("practice-other").addEventListener("click", exitToSelect);
   $("practice-again").addEventListener("click", () => runPlan(plan));
+
+  // 연습 완주 → 진짜 폰에서 이어서 배우기 (폰 사용법에 같은 질문을 미리 채워준다)
+  $("practice-real").addEventListener("click", () => {
+    const q = lastRequest || (plan && plan.title) || "";
+    exitToSelect();
+    $("phone-result").classList.add("hidden");
+    $("phone-start").classList.remove("hidden");
+    $("phone-question").value = q;
+    goScreen("phone");
+    toast("이제 진짜 폰 화면을 캡처해서 올리면 어디를 누를지 짚어드려요");
+  });
+
+  // 지난 기록에서 저장된 연습을 다시 실행할 때 쓰는 진입점
+  window.runPracticePlan = (savedPlan) => {
+    lastRequest = savedPlan.title || "";
+    runPlan(savedPlan);
+  };
 })();

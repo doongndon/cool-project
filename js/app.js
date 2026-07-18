@@ -84,6 +84,7 @@ $("save-key").addEventListener("click", () => {
   localStorage.setItem(KEY_STORAGE, key);
   $("settings-modal").classList.add("hidden");
   toast("저장했어요! 이제 사용하실 수 있어요");
+  loadDailyTip(); // 키가 생겼으니 오늘의 꿀팁도 바로 보여준다
 });
 function requireKey() {
   if (!getKey()) {
@@ -286,9 +287,10 @@ function saveHistoryEntry(entry) {
   }
 }
 const HISTORY_META = {
-  doc:   { icon: "#i-doc",    cls: "blue",  label: "서류 해석" },
-  phone: { icon: "#i-phone",  cls: "green", label: "폰 사용법" },
-  scam:  { icon: "#i-shield", cls: "red",   label: "사기 검사" },
+  doc:      { icon: "#i-doc",    cls: "blue",   label: "서류 해석" },
+  phone:    { icon: "#i-phone",  cls: "green",  label: "폰 사용법" },
+  scam:     { icon: "#i-shield", cls: "red",    label: "사기 검사" },
+  practice: { icon: "#i-play",   cls: "orange", label: "연습" },
 };
 function formatDate(ts) {
   const d = new Date(ts);
@@ -329,6 +331,10 @@ function openHistoryEntry(idx) {
     goScreen("scam");
     $("scam-start").classList.add("hidden");
     renderScamResult(entry.data);
+  } else if (entry.type === "practice") {
+    // 저장된 AI 연습 계획을 API 호출 없이 다시 실행한다
+    goScreen("practice");
+    window.runPracticePlan(entry.data);
   }
 }
 $("history-clear").addEventListener("click", () => {
