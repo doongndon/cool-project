@@ -3,4 +3,4 @@
 // 2) 아래에 본인의 Gemini API 키를 넣기 (https://aistudio.google.com/apikey 에서 무료 발급)
 // config.js 는 .gitignore 에 등록되어 있어 저장소에 올라가지 않습니다.
 // 주의: 키를 절대 GitHub에 커밋하지 마세요!
-window.AI_SONJU_DEFAULT_KEY = "여기에_API_키_붙여넣기";
+window.AI_SONJU_DEFAULT_KEY = "AIzaSyAzxF5auIeJm2u7M6TzkH1uxz0_zXqsMyE";
