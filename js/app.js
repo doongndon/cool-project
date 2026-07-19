@@ -87,12 +87,14 @@ function toast(msg, ms = 3500) {
 }
 
 // ---------- API 키 ----------
+// 구글 Gemini 키는 두 가지 형식이 있다: 예전 "AIza..."와 새 "AQ...."
+const KEY_FMT = /^(AIza[0-9A-Za-z._-]{20,}|AQ\.[0-9A-Za-z._-]{20,})$/;
 function getKey() {
-  // 내 폰에 직접 저장한 키가 항상 최우선 — 배포본 내장 키가 죽어도 설정에서 바로 덮어쓸 수 있다
+  // 내 기기에 직접 저장한 키가 항상 최우선 — 내장 키가 죽어도 설정에서 바로 덮어쓸 수 있다
   const mine = (localStorage.getItem(KEY_STORAGE) || "").trim();
   if (mine) return mine;
-  const embedded = window.AI_SONJU_DEFAULT_KEY;
-  if (embedded && /^AIza[0-9A-Za-z_-]{30,}$/.test(embedded)) return embedded;
+  const embedded = (window.AI_SONJU_DEFAULT_KEY || "").trim();
+  if (KEY_FMT.test(embedded)) return embedded;
   return "";
 }
 function openSettings() {
