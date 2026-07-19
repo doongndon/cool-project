@@ -8,7 +8,9 @@
 
 // ---------- 설정 ----------
 // 무료 등급에서 쓸 수 있는 모델을 순서대로 시도한다 (404/미지원이면 다음 모델로)
-const MODELS = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"];
+// 실제로 살아있는 모델만 (1.5-flash·2.5-flash-lite는 v1beta에서 제거됨 → 404 원인이었음).
+// 앞 모델이 사용량 초과되면 다음으로 자동 전환.
+const MODELS = ["gemini-2.5-flash", "gemini-flash-latest", "gemini-2.0-flash"];
 const API_BASE = "https://generativelanguage.googleapis.com/v1beta/models";
 const KEY_STORAGE = "ai_sonju_gemini_key";
 const FONT_STORAGE = "ai_sonju_font_scale";
@@ -221,13 +223,14 @@ async function callGemini(parts, { json = true } = {}) {
           // fetch 자체가 실패하면 영어 오류 대신 쉬운 안내를 보여준다
           throw new Error("인터넷 연결이 안 되는 것 같아요. 와이파이나 데이터를 확인하고 다시 눌러주세요.");
         }
-        if (res.status === 404) { lastErr = new Error("model-not-found"); break; }
+        // 없는 모델(404)이면 조용히 다음 모델로 넘어간다 (사용자에겐 안 보임)
+        if (res.status === 404) { lastErr = new Error("잠시 문제가 생겼어요. 다시 한 번 눌러주세요."); break; }
         if (res.status === 429) {
           // 무료 사용량은 모델별로 따로다: 짧게 재시도해보고, 그래도 막히면 다음 모델로 갈아탄다
           if (attempt === 0) { toast("사용량이 많아 잠시 기다렸다 다시 해볼게요..."); await sleep(3000); continue; }
-          lastErr = new Error("오늘 무료 사용량을 모두 썼어요. 잠시 후 다시 해주세요.");
+          lastErr = new Error("지금은 사용량이 가득 찼어요. 1~2분 뒤에 다시 해주세요.");
           const next = MODELS[MODELS.indexOf(model) + 1];
-          if (next) toast("이 모델 사용량이 가득 차서 예비 모델로 바꿔볼게요...");
+          if (next) toast("예비 모델로 바꿔볼게요...");
           break;
         }
         if (res.status === 400 || res.status === 403) {
@@ -248,12 +251,11 @@ async function callGemini(parts, { json = true } = {}) {
         if (!text) throw new Error("답을 받지 못했어요. 다시 한 번 눌러주세요.");
         return json ? parseJsonSafe(text) : text;
       } catch (e) {
-        if (e.message === "model-not-found") break;
         throw e;
       }
     }
   }
-  throw lastErr || new Error("사용할 수 있는 모델을 찾지 못했어요. 잠시 후 다시 해주세요.");
+  throw lastErr || new Error("지금은 연결이 어려워요. 1~2분 뒤에 다시 해주세요.");
 }
 
 // 모델이 ```json 코드블록이나 설명 문장으로 감싸는 경우까지 대비해 JSON만 뽑아낸다
