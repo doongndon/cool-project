@@ -8,9 +8,11 @@
 
 // ---------- 설정 ----------
 // 무료 등급에서 쓸 수 있는 모델을 순서대로 시도한다 (404/미지원이면 다음 모델로)
-// 실제로 살아있는 모델만 (1.5-flash·2.5-flash-lite는 v1beta에서 제거됨 → 404 원인이었음).
-// 앞 모델이 사용량 초과되면 다음으로 자동 전환.
-const MODELS = ["gemini-2.5-flash", "gemini-flash-latest", "gemini-2.0-flash"];
+// Gemini 먼저(깔끔한 JSON) → 사용량 차면 Gemma로 자동 전환(무료 할당량 넉넉).
+// Gemma는 JSON 강제 옵션을 무시하므로, 그 모델일 땐 프롬프트로 JSON을 유도하고
+// 응답에서 JSON만 뽑아낸다(parseJsonSafe).
+const MODELS = ["gemini-2.5-flash", "gemini-flash-latest", "gemini-2.0-flash", "gemma-4-26b-a4b-it", "gemma-4-31b-it"];
+const isGemma = (m) => m.startsWith("gemma");
 const API_BASE = "https://generativelanguage.googleapis.com/v1beta/models";
 const KEY_STORAGE = "ai_sonju_gemini_key";
 const FONT_STORAGE = "ai_sonju_font_scale";
@@ -186,6 +188,17 @@ async function callGemini(parts, { json = true } = {}) {
     generationConfig: json ? { responseMimeType: "application/json", temperature: 0.3 } : { temperature: 0.3 },
   };
 
+  // 특정 모델용으로 요청 본문을 살짝 바꾼다 (Gemma는 responseMimeType 미지원)
+  function bodyFor(model) {
+    if (!isGemma(model)) return body;
+    const gemmaParts = parts.map((p) => ({ ...p }));
+    if (json) {
+      const i = gemmaParts.findIndex((p) => typeof p.text === "string");
+      if (i >= 0) gemmaParts[i] = { text: gemmaParts[i].text + "\n\n[중요] 다른 말은 절대 붙이지 말고 위 JSON만 출력하세요." };
+    }
+    return { contents: [{ role: "user", parts: gemmaParts }], generationConfig: { temperature: 0.2 } };
+  }
+
   // 프록시 서버가 설정돼 있으면 그쪽으로 보낸다 (키가 서버에 숨겨져 있어 어르신은 아무것도 안 넣어도 됨)
   if (window.AI_SONJU_PROXY_URL) {
     let res;
@@ -217,7 +230,7 @@ async function callGemini(parts, { json = true } = {}) {
           res = await fetch(`${API_BASE}/${model}:generateContent?key=${encodeURIComponent(key)}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(body),
+            body: JSON.stringify(bodyFor(model)),
           });
         } catch (_) {
           // fetch 자체가 실패하면 영어 오류 대신 쉬운 안내를 보여준다
@@ -258,14 +271,34 @@ async function callGemini(parts, { json = true } = {}) {
   throw lastErr || new Error("지금은 연결이 어려워요. 1~2분 뒤에 다시 해주세요.");
 }
 
-// 모델이 ```json 코드블록이나 설명 문장으로 감싸는 경우까지 대비해 JSON만 뽑아낸다
+// 모델이 ```json 코드블록이나 설명 문장으로 감싸거나(특히 Gemma) 여러 덩어리를
+// 뱉는 경우까지 대비해, 텍스트 안의 '균형 잡힌' JSON 객체들을 찾아 파싱을 시도한다.
 function parseJsonSafe(text) {
   const stripped = text.replace(/```json/gi, "").replace(/```/g, "").trim();
   try { return JSON.parse(stripped); } catch (_) { /* 아래에서 재시도 */ }
-  const start = stripped.indexOf("{");
-  const end = stripped.lastIndexOf("}");
-  if (start !== -1 && end > start) {
-    try { return JSON.parse(stripped.slice(start, end + 1)); } catch (_) { /* 아래로 */ }
+
+  // 중괄호 짝을 세어 완결된 { ... } 후보들을 모은다
+  const candidates = [];
+  let depth = 0, startIdx = -1, inStr = false, esc = false;
+  for (let i = 0; i < stripped.length; i++) {
+    const c = stripped[i];
+    if (inStr) {
+      if (esc) esc = false;
+      else if (c === "\\") esc = true;
+      else if (c === '"') inStr = false;
+      continue;
+    }
+    if (c === '"') inStr = true;
+    else if (c === "{") { if (depth === 0) startIdx = i; depth++; }
+    else if (c === "}") { depth--; if (depth === 0 && startIdx !== -1) { candidates.push(stripped.slice(startIdx, i + 1)); startIdx = -1; } }
+  }
+  // 내용이 가장 많은(=실제 답에 가까운) 후보부터 파싱 시도. 빈 템플릿은 뒤로.
+  candidates.sort((a, b) => b.length - a.length);
+  for (const c of candidates) {
+    try {
+      const obj = JSON.parse(c);
+      if (obj && typeof obj === "object" && Object.keys(obj).length) return obj;
+    } catch (_) { /* 다음 후보 */ }
   }
   throw new Error("답을 정리하다 문제가 생겼어요. 한 번만 다시 눌러주세요.");
 }
